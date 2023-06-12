@@ -20,16 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EMOJI_SUCCESS = "<:tick:968112329587838976>"
-EMOJI_ERROR = "<:cross:968112329470390292>"
-EMOJI_WARNING = "<:warning:1007277669634809886>"
-EMOJI_DANGER = "<:danger:967991999674318848>"
-EMOJI_HEALTH = "<:heart:1117777568913965076>"
-EMOJI_HEALTH_HALF = "<:half_heart:1117777596801896458>"
-EMOJI_HEALTH_EMPTY = "<:empty_heart:1117784040808927293>"
-EMOJI_PROGRESS_BAR_START_FILLED = "<:ps1:1006917120937959534>"
-EMOJI_PROGRESS_BAR_START_UNFILLED = "<:ps0:1006917220934373489>"
-EMOJI_PROGRESS_BAR_MID_FILLED = "<:p1:1006917386311585872>"
-EMOJI_PROGRESS_BAR_MID_UNFILLED = "<:p0:1006917451675607090>"
-EMOJI_PROGRESS_BAR_END_FILLED = "<:pe1:1006917300991041636>"
-EMOJI_PROGRESS_BAR_END_UNFILLED = "<:pe0:1006917263770783774>"
+from __future__ import annotations
+
+from tortoise.models import Model
+from tortoise import fields
+
+__all__ = (
+    "Player",
+)
+
+
+class Player(Model):
+    """Represents a survival player."""
+
+    id = fields.IntField(pk=True)
+    """The Discord user ID."""
+
+    level = fields.IntField(default=0)
+    """Player's current level."""
+
+    xp = fields.IntField(default=0)
+    """The experience points that the player has."""
+
+    health = fields.FloatField(default=10)
+    """The player's current health."""
+
+    def get_required_xp(self) -> int:
+        """Returns the required XP to level up."""
+        return self.level * 100

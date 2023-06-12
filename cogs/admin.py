@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
+from tortoise import Tortoise
 from discord.ext import commands
 from core import cosmetics
 
@@ -90,6 +91,12 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
                 total += 1
         
         await ctx.send(f"{cosmetics.EMOJI_SUCCESS} Reloaded {total} extensions successfully. {len(to_reload) - total} extensions failed to reload.")
+
+    @commands.command()
+    async def genschema(self, ctx: commands.Context[CobbleBot]) -> None:
+        """Generates Tortoise database schema."""
+        await Tortoise.generate_schemas()
+        await ctx.send(f"{cosmetics.EMOJI_SUCCESS} Done!")
 
 
 async def setup(bot: CobbleBot):

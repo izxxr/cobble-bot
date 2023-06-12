@@ -23,9 +23,12 @@
 from __future__ import annotations
 
 from typing import List, Optional
+from discord import app_commands
+from tortoise import Tortoise
+from core import utils, cosmetics
 from discord.ext import commands
 from discord.utils import MISSING
-from core import utils
+from core.checks import GenericError
 
 import os
 import logging
@@ -46,6 +49,19 @@ class Config:
         self.debug_mode: bool = utils.get_config("COBBLE_DEBUG_MODE", False)
         self.debug_guild_id: Optional[int] = utils.get_config("COBBLE_GUILD_ID", None, factory=int)
 
+class CobbleCommandTree(app_commands.CommandTree):
+    """The app command tree."""
+    async def on_error(  # type: ignore  # As always, Pyright is dumb.
+            self,
+            interaction: discord.Interaction[CobbleBot],
+            error: app_commands.AppCommandError
+        ) -> None:
+
+        if isinstance(error, GenericError):
+            await interaction.response.send_message(f'{cosmetics.EMOJI_ERROR} {error.message}')
+        else:
+            raise error
+
 
 class CobbleBot(commands.Bot):
     """The cobble bot.
@@ -63,6 +79,7 @@ class CobbleBot(commands.Bot):
             description="A minecraft-inspired bot bringing fun survival experience to Discord servers.",
             allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=False, users=False, roles=False),
             max_messages=None,
+            tree_cls=CobbleCommandTree,
         )
 
         self.config: Config = MISSING
@@ -118,5 +135,9 @@ class CobbleBot(commands.Bot):
         logging.info(f'Loaded {loaded} extensions. {total - loaded} extensions could not be loaded.')
 
 
+    async def init_database(self) -> None:
+        await Tortoise.init(db_url='sqlite://db.sqlite3', modules=dict(models=['core.models']))  # type: ignore
+
     async def setup_hook(self) -> None:
         await self.init_extensions()
+        await self.init_database()

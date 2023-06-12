@@ -20,16 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EMOJI_SUCCESS = "<:tick:968112329587838976>"
-EMOJI_ERROR = "<:cross:968112329470390292>"
-EMOJI_WARNING = "<:warning:1007277669634809886>"
-EMOJI_DANGER = "<:danger:967991999674318848>"
-EMOJI_HEALTH = "<:heart:1117777568913965076>"
-EMOJI_HEALTH_HALF = "<:half_heart:1117777596801896458>"
-EMOJI_HEALTH_EMPTY = "<:empty_heart:1117784040808927293>"
-EMOJI_PROGRESS_BAR_START_FILLED = "<:ps1:1006917120937959534>"
-EMOJI_PROGRESS_BAR_START_UNFILLED = "<:ps0:1006917220934373489>"
-EMOJI_PROGRESS_BAR_MID_FILLED = "<:p1:1006917386311585872>"
-EMOJI_PROGRESS_BAR_MID_UNFILLED = "<:p0:1006917451675607090>"
-EMOJI_PROGRESS_BAR_END_FILLED = "<:pe1:1006917300991041636>"
-EMOJI_PROGRESS_BAR_END_UNFILLED = "<:pe0:1006917263770783774>"
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from discord import app_commands
+from core.models import Player
+
+if TYPE_CHECKING:
+    from discord import Interaction
+
+__all__ = (
+    'GenericError',
+    'has_survival_profile',
+)
+
+
+class GenericError(app_commands.AppCommandError):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+        self.message = message
+
+
+def has_survival_profile():
+    """Check to ensure that the user running a command has a survival profile."""
+    async def predicate(interaction: Interaction) -> bool:
+        profile = await Player.filter(id=interaction.user.id).first()
+        if profile:
+            interaction.extras["survival_profile"] = profile
+            return True
+
+        raise GenericError('No survival profile created yet. Use `/profile start` to create one.')
+
+    return app_commands.check(predicate)

@@ -22,10 +22,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, List
+from core import cosmetics
 from discord.utils import MISSING
 
 import dotenv
+import math
 import os
 
 __all__ = (
@@ -65,3 +67,38 @@ def get_config(
                 return False
             raise ValueError(f'the value for variable "{key}" must be either true or false.')
         return val
+
+def progress_bar(progress: float, total: float, *, length: int = 10) -> str:
+    """Creates a progress bar using emojis from the given progress and total values.
+    
+    The length parameter determines the total length of the progress bar (inclusive
+    of the two terminals).
+    """
+    filled_emojis = math.floor((progress / total) * length) if total != 0 else 0
+    unfilled_emojis = length - filled_emojis
+
+    emojis: List[str] = []
+
+    if filled_emojis == 0:
+        emojis.append(cosmetics.EMOJI_PROGRESS_BAR_START_UNFILLED)
+        unfilled_emojis -= 1
+    else:
+        for x in range(filled_emojis):
+            if x == 0:
+                # start of progress bar
+                emojis.append(cosmetics.EMOJI_PROGRESS_BAR_START_FILLED)
+            else:
+                emojis.append(cosmetics.EMOJI_PROGRESS_BAR_MID_FILLED)
+
+    if unfilled_emojis == 0:
+        emojis.pop()  # maintain the provided length
+        emojis.append(cosmetics.EMOJI_PROGRESS_BAR_END_FILLED)
+    else:
+        for x in range(unfilled_emojis):
+            if x == (unfilled_emojis - 1):
+                # end of progress bar reached
+                emojis.append(cosmetics.EMOJI_PROGRESS_BAR_END_UNFILLED)
+            else:
+                emojis.append(cosmetics.EMOJI_PROGRESS_BAR_MID_UNFILLED)
+
+    return "".join(emojis)
