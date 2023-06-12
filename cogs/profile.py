@@ -97,10 +97,14 @@ class Profile(commands.GroupCog):
 
         embed = discord.Embed(title=f":pick: Survival Profile", color=discord.Color.light_embed())
         embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
-        embed.add_field(
-            name=f"Level {profile.level}",
-            value=f"{utils.progress_bar(profile.xp, required_xp)} ({profile.xp}/{required_xp})",
-        )
+
+        if profile.level == 0:
+            embed.add_field(name="No level yet", value="Use various commands to level up!")
+        else:
+            embed.add_field(
+                name=f"Level {profile.level}",
+                value=f"{utils.progress_bar(profile.xp, required_xp)} ({profile.xp}/{required_xp})",
+            )
 
         full_hearts = int(profile.health // 1)
         half_heart = True if (profile.health % 1) == 0.5 else False
