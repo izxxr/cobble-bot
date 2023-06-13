@@ -22,6 +22,7 @@
 
 from __future__ import annotations
 
+from core.datamodels import Achievements
 from tortoise.models import Model
 from tortoise import fields
 
@@ -48,6 +49,15 @@ class Player(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     """The time when the player profile was created."""
 
+    achievements = fields.BigIntField(default=0)
+    """The  achievements of user."""
+
     def get_required_xp(self) -> int:
         """Returns the required XP to level up."""
         return self.level * 100
+
+    def get_achievements(self) -> Achievements:
+        """Returns the achievements a user has."""
+        ach = Achievements()
+        ach.value = self.achievements
+        return ach

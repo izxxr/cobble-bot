@@ -98,6 +98,12 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
         await Tortoise.generate_schemas()
         await ctx.send(f"{cosmetics.EMOJI_SUCCESS} Done!")
 
+    @commands.command()
+    async def reloadmeta(self, ctx: commands.Context[CobbleBot]) -> None:
+        """Reloads the JSON metadata cache."""
+        self.bot.cache_data()
+        await ctx.send(f"{cosmetics.EMOJI_SUCCESS} Done!")
+
 
 async def setup(bot: CobbleBot):
     await bot.add_cog(Admin(bot))

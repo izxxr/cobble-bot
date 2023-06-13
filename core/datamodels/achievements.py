@@ -22,22 +22,23 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from tortoise import fields
-from tortoise.models import Model
-
-if TYPE_CHECKING:
-    from core.models.player import Player
-
+from discord.flags import BaseFlags, flag_value, fill_with_flags
 
 __all__ = (
-    'Achievement',
+    'Achievements',
 )
 
 
-class Achievement(Model):
-    """The achievements that a player has."""
-    user: fields.ForeignKeyRelation[Player] = fields.ForeignKeyField("models.Player", related_name="achievements")
+@fill_with_flags()
+class Achievements(BaseFlags):
+    """Represents the achievements a user has."""
 
-    discovered_biome_desert = fields.BooleanField(default=False)
-    discovered_biome_ocean  = fields.BooleanField(default=False)
+    @flag_value
+    def discovered_biome_desert(self) -> int:
+        """Discover the desert biome."""
+        return 1 << 0
+
+    @flag_value
+    def discovered_biome_ocean(self) -> int:
+        """Discover the ocean biome."""
+        return 1 << 1

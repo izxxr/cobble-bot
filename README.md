@@ -1,2 +1,2 @@
-# cobble-bot
-Minecraft inspired bot bringing fun survival experience to Discord
+# Cobble
+Minecraft inspired bot bringing fun survival experience to Discord.

@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Tuple
 from discord.ext import commands
 from discord import app_commands, ui
-from core.models import Achievement
+from core.models import Player
 from core import checks, datamodels, views, cosmetics
 
 import discord
@@ -57,11 +57,11 @@ class ExplorationBiomeSelect(ui.Select[ExplorationBiomeSelectView]):
         self.view.stop()
         self.view.selected_biome = self.bot.biomes[self.values[0]]
 
-    def populate(self, achievement: Achievement) -> None:
+    def populate(self, player: Player) -> None:
         biomes = self.bot.biomes
 
         for biome_id, biome in biomes.items():
-            if biome.discovery_achievement and not getattr(achievement, biome.discovery_achievement):
+            if not biome.discovered(player):
                 continue
 
             self.add_option(
@@ -82,13 +82,9 @@ class Survival(commands.Cog):
     async def explore(self, interaction: discord.Interaction):
         """Explore different biomes and collect valuables and other resources."""
         profile = interaction.extras["survival_profile"]
-        achievement = await Achievement.filter(user=profile).first()
-
-        if achievement is None:
-            achievement = await Achievement.create(user=profile)
 
         view = ExplorationBiomeSelectView(interaction.user, self.bot)
-        view.selector.populate(achievement)
+        view.selector.populate(profile)
 
         embed = discord.Embed(
             title=":hiking_boot: Explore • Select Biome",

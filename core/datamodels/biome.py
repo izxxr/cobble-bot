@@ -22,8 +22,11 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
+
+if TYPE_CHECKING:
+    from core.models import Player
 
 __all__ = (
     'Biome',
@@ -41,4 +44,11 @@ class Biome:
     discovery_probability: float
     background: str
     emoji: str
-    discovery_achievement: Optional[str] = None
+    discovery_achievement: int = 0
+
+    def discovered(self, player: Player) -> bool:
+        """Checks whether the provided player has discovered this biome."""
+        val = self.discovery_achievement
+        if val == 0:
+            return True
+        return (player.achievements & val) == val

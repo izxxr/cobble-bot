@@ -161,3 +161,5 @@ cython_debug/
 
 db.sqlite3-shm
 db.sqlite3-wal
+
+test.*

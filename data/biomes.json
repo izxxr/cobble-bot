@@ -3,7 +3,7 @@
         "display_name": "Plains",
         "description": "Temperate grasslands plains.",
         "rarity": "common",
-        "discovery_probability": 1,
+        "discovery_probability": 0,
         "background": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/52/Plains.png/revision/latest?cb=20220324022601",
         "emoji": "<:minecraft_grass:1118034850755121204>"
     },
@@ -14,7 +14,7 @@
         "discovery_probability": 0.4,
         "background": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6d/Desert.png/revision/latest?cb=20220103192043",
         "emoji": "<:minecraft_sand:1118035607239802920>",
-        "discovery_achievement": "discovered_biome_desert" 
+        "discovery_achievement": 1 
     },
     "ocean": {
         "display_name": "Ocean",
@@ -23,6 +23,6 @@
         "discovery_probability": 0.2,
         "background": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/89/Ocean.png/revision/latest?cb=20230112154919",
         "emoji": "<:minecraft_water:1118050009385009182>",
-        "discovery_achievement": "discovered_biome_ocean"
+        "discovery_achievement": 2
     }
 }
