@@ -1,0 +1,91 @@
+{
+    "sticks": {
+        "display_name": "Sticks",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Sticks made of wood. Looks like they can be helpful for tools...",
+        "emoji": "<:minecraft_stick:1118050565499392000>",
+        "crafting_recipe": {
+            "wood": 2
+        }
+    },
+    "string": {
+        "display_name": "String",
+        "rarity": "common",
+        "type": "drops",
+        "description": "Somewhat elastic strings.",
+        "emoji": "<:minecraft_string:1118051859773522020>"
+    },
+    "oak_wood": {
+        "display_name": "Oak Wood",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Strong and dense wood from oak tree.",
+        "emoji": "<:minecraft_oak_wood:1118051855046561812>"
+    },
+    "bone": {
+        "display_name": "Bone",
+        "rarity": "common",
+        "type": "drops",
+        "description": "Dense piece of bone, doesn't look like from a human though...",
+        "emoji": "<:minecraft_bone:1118051848025292871>"
+    },
+    "cactus": {
+        "display_name": "Cactus",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Cactus plant, doesn't look too good to hold.",
+        "emoji": "<:minecraft_cactus:1118051843172474880>"
+    },
+    "sand": {
+        "display_name": "Sand",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Sand, Nothing too special about it.",
+        "emoji": "<:minecraft_sand:1118035607239802920>"
+    },
+    "glass": {
+        "display_name": "Glass",
+        "rarity": "common",
+        "type": "materials",
+        "smelting_recipe": "sand",
+        "description": "Normal looking glass",
+        "emoji": "<:minecraft_glass:1118051834997780541>"
+    },
+    "glass_bottle": {
+        "display_name": "Glass Bottle",
+        "rarity": "common",
+        "type": "tools",
+        "description": "A small and shiny bottle made up of glass with a small wooden stopper.",
+        "crafting_recipe": {
+            "glass": 3,
+            "oak_wood": 1
+        },
+        "emoji": "<:minecraft_glass_bottle:1118051812868628591>"
+    },
+    "saddle": {
+        "display_name": "Saddle",
+        "rarity": "uncommon",
+        "type": "collectibles",
+        "description": "A saddle made up of leather. This could make travelling a lot easier.",
+        "emoji": "<:minecraft_saddle:1118051827817136179>"
+    },
+    "raw_salmon": {
+        "display_name": "Raw Salmon",
+        "rarity": "common",
+        "type": "food",
+        "description": "Dead and uncooked salmon",
+        "emoji": "<:minecraft_raw_salmon:1118051823987740704>"
+    },
+    "fishing_rod": {
+        "display_name": "Fishing Rod",
+        "rarity": "common",
+        "type": "tools",
+        "description": "A fishing rod with a small bobber.",
+        "crafting_recipe": {
+            "sticks": 3,
+            "string": 2
+        },
+        "emoji": "<:minecraft_fishing_rod:1118051817830486057>"
+    }
+}

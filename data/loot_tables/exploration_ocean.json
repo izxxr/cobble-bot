@@ -1,0 +1,24 @@
+{
+    "name": "exploration_ocean",
+    "raw_salmon": {
+        "probability": 0.9,
+        "quantity": [10, 20]
+    },
+    "fishing_rod": {
+        "probability": 0.4,
+        "quantity": [1, 2],
+        "durability": [3, 6]
+    },
+    "sticks": {
+        "probability": 0.7,
+        "quantity": [1, 10]
+    },
+    "string": {
+        "probability": 0.5,
+        "quantity": [2, 8]
+    },
+    "bone": {
+        "probability": 0.4,
+        "quantity": [1, 8]
+    }
+}

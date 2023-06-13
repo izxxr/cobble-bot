@@ -22,32 +22,36 @@
 
 from __future__ import annotations
 
-from tortoise.models import Model
-from tortoise import fields
+from typing import Tuple, Any, Optional, Dict
+from dataclasses import dataclass
 
 __all__ = (
-    "Player",
+    'LootTable',
+    'LootTableItem',
 )
 
 
-class Player(Model):
-    """Represents a survival player."""
+@dataclass
+class LootTable:
+    """Represents a loot table.
+    
+    Loot table determines the loot that can be obtained from a specific action. It
+    also includes the probability and various conditions that must be satisfied to
+    obtain a specific loot.
+    """
+    name: str
+    items: Dict[str, LootTableItem]
 
-    id = fields.IntField(pk=True)
-    """The Discord user ID."""
 
-    level = fields.IntField(default=0)
-    """Player's current level."""
+@dataclass
+class LootTableItem:
+    """Represents an item associated to a loot table."""
 
-    xp = fields.IntField(default=0)
-    """The experience points that the player has."""
+    id: str
+    probability: float
+    quantity: Tuple[int, int]
+    durability: Optional[Tuple[int, int]] = None
 
-    health = fields.FloatField(default=8)
-    """The player's current health."""
-
-    created_at = fields.DatetimeField(auto_now_add=True)
-    """The time when the player profile was created."""
-
-    def get_required_xp(self) -> int:
-        """Returns the required XP to level up."""
-        return self.level * 100
+    def __post_init__(self, *args: Any, **kw: Any) -> None:
+        self.durability = tuple(self.durability) if self.durability else None
+        self.quantity = tuple(self.quantity)

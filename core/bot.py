@@ -22,15 +22,16 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 from discord import app_commands
 from tortoise import Tortoise
-from core import utils, cosmetics
+from core import utils, cosmetics, datamodels
 from discord.ext import commands
 from discord.utils import MISSING
 from core.checks import GenericError
 
 import os
+import json
 import logging
 import discord
 
@@ -39,6 +40,12 @@ __all__ = (
 )
 
 _log = logging.getLogger()
+
+LOOT_TABLES_PATHS = [
+    "data/loot_tables/exploration_plains.json",
+    "data/loot_tables/exploration_desert.json",
+    "data/loot_tables/exploration_ocean.json",
+]
 
 
 class Config:
@@ -83,6 +90,11 @@ class CobbleBot(commands.Bot):
         )
 
         self.config: Config = MISSING
+
+        # Data caches
+        self.items: Dict[str, datamodels.Item] = {}
+        self.biomes: Dict[str, datamodels.Biome] = {}
+        self.loot_tables: Dict[str, datamodels.LootTable] = {}
 
     async def launch(self) -> None:
         """Initializes and starts the bot.
@@ -138,6 +150,43 @@ class CobbleBot(commands.Bot):
     async def init_database(self) -> None:
         await Tortoise.init(db_url='sqlite://db.sqlite3', modules=dict(models=['core.models']))  # type: ignore
 
+    def cache_data(self) -> None:
+        """Caches the data stored in JSON files in data directory."""
+        _log.info("Preparing cache for survival data")
+
+        with open('data/items.json') as f:
+            file = json.loads(f.read())
+
+            for item_id, data in file.items():
+                item = datamodels.Item(item_id, **data)
+                self.items[item_id] = item
+
+        with open('data/biomes.json') as f:
+            file = json.loads(f.read())
+
+            for biome_id, data in file.items():
+                biome = datamodels.Biome(biome_id, **data)
+                self.biomes[biome_id] = biome
+
+        _log.info("Caching loot tables")
+
+        for path in LOOT_TABLES_PATHS:
+            with open(path) as f:
+                file = json.loads(f.read())
+                loot_table_name = None
+                items: Dict[str, datamodels.LootTableItem] = {}
+
+                for item_id, data in file.items():
+                    if item_id == "name":
+                        loot_table_name = data
+                    else:
+                        item = datamodels.LootTableItem(item_id, **data)
+                        items[item_id] = item
+
+                assert loot_table_name is not None
+                self.loot_tables[loot_table_name] = datamodels.LootTable(loot_table_name, items)
+
     async def setup_hook(self) -> None:
         await self.init_extensions()
         await self.init_database()
+        self.cache_data()

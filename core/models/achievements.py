@@ -22,32 +22,22 @@
 
 from __future__ import annotations
 
-from tortoise.models import Model
+from typing import TYPE_CHECKING
 from tortoise import fields
+from tortoise.models import Model
+
+if TYPE_CHECKING:
+    from core.models.player import Player
+
 
 __all__ = (
-    "Player",
+    'Achievement',
 )
 
 
-class Player(Model):
-    """Represents a survival player."""
+class Achievement(Model):
+    """The achievements that a player has."""
+    user: fields.ForeignKeyRelation[Player] = fields.ForeignKeyField("models.Player", related_name="achievements")
 
-    id = fields.IntField(pk=True)
-    """The Discord user ID."""
-
-    level = fields.IntField(default=0)
-    """Player's current level."""
-
-    xp = fields.IntField(default=0)
-    """The experience points that the player has."""
-
-    health = fields.FloatField(default=8)
-    """The player's current health."""
-
-    created_at = fields.DatetimeField(auto_now_add=True)
-    """The time when the player profile was created."""
-
-    def get_required_xp(self) -> int:
-        """Returns the required XP to level up."""
-        return self.level * 100
+    discovered_biome_desert = fields.BooleanField(default=False)
+    discovered_biome_ocean  = fields.BooleanField(default=False)

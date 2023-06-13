@@ -108,7 +108,7 @@ class Profile(commands.GroupCog):
 
         full_hearts = int(profile.health // 1)
         half_heart = True if (profile.health % 1) == 0.5 else False
-        empty_hearts = int(10 - profile.health)
+        empty_hearts = int(8 - profile.health)
 
         embed.add_field(
             name="Health",
@@ -116,6 +116,7 @@ class Profile(commands.GroupCog):
             inline=False,
         )
 
+        embed.set_footer(text=f"Survival profile created on {profile.created_at.strftime('%b %d, %Y')}")
         await interaction.response.send_message(embed=embed)
 
 

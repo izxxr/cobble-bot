@@ -1,0 +1,19 @@
+{
+    "name": "exploration_plains",
+    "sticks": {
+        "probability": 0.7,
+        "quantity": [1, 10]
+    },
+    "string": {
+        "probability": 0.5,
+        "quantity": [2, 8]
+    },
+    "oak_wood": {
+        "probability": 0.6,
+        "quantity": [1, 5] 
+    },
+    "bone": {
+        "probability": 0.4,
+        "quantity": [1, 8]
+    }
+}

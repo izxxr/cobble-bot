@@ -33,15 +33,14 @@ if TYPE_CHECKING:
     from discord import Interaction
 
 __all__ = (
+    'AuthorizedView',
     'Confirmation',
 )
 
 
-class Confirmation(ui.View):
+class AuthorizedView(ui.View):
     def __init__(self, *, timeout: Optional[float] = 180, user: Snowflake):
         super().__init__(timeout=timeout)
-
-        self.confirmed: Optional[bool] = None
         self.user = user
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -50,6 +49,12 @@ class Confirmation(ui.View):
             return False
 
         return True
+
+
+class Confirmation(AuthorizedView):
+    def __init__(self, *, timeout: Optional[float] = 180, user: Snowflake):
+        super().__init__(timeout=timeout, user=user)
+        self.confirmed: Optional[bool] = None
 
     @ui.button(label='Confirm', style=ButtonStyle.green)
     async def confirm_button(self, interaction: Interaction, button: ui.Button[Self]) -> None:

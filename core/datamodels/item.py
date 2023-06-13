@@ -22,32 +22,23 @@
 
 from __future__ import annotations
 
-from tortoise.models import Model
-from tortoise import fields
+from typing import Dict, Optional
+from dataclasses import dataclass
 
 __all__ = (
-    "Player",
+    'Item',
 )
 
 
-class Player(Model):
-    """Represents a survival player."""
+@dataclass
+class Item:
+    """Represents an obtainable item."""
 
-    id = fields.IntField(pk=True)
-    """The Discord user ID."""
-
-    level = fields.IntField(default=0)
-    """Player's current level."""
-
-    xp = fields.IntField(default=0)
-    """The experience points that the player has."""
-
-    health = fields.FloatField(default=8)
-    """The player's current health."""
-
-    created_at = fields.DatetimeField(auto_now_add=True)
-    """The time when the player profile was created."""
-
-    def get_required_xp(self) -> int:
-        """Returns the required XP to level up."""
-        return self.level * 100
+    id: str
+    display_name: str
+    description: str
+    rarity: str
+    type: str
+    emoji: str
+    crafting_recipe: Optional[Dict[str, int]] = None
+    smelting_recipe: Optional[str] = None
