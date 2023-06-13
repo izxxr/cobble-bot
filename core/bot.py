@@ -84,7 +84,7 @@ class CobbleBot(commands.Bot):
             command_prefix=commands.when_mentioned_or('?'),
             intents=discord.Intents(guilds=True, messages=True, message_content=True),
             description="A minecraft-inspired bot bringing fun survival experience to Discord servers.",
-            allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=False, users=False, roles=False),
+            allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=False, roles=False),
             max_messages=None,
             tree_cls=CobbleCommandTree,
         )

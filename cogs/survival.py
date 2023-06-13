@@ -29,7 +29,6 @@ from core.models import Player, InventoryItem
 from core import checks, datamodels, views, cosmetics
 
 import discord
-import asyncio
 import random
 
 if TYPE_CHECKING:
@@ -81,7 +80,7 @@ class Survival(commands.Cog):
     @checks.has_survival_profile()
     async def explore(self, interaction: discord.Interaction):
         """Explore different biomes and collect valuables and other resources."""
-        profile = interaction.extras["survival_profile"]
+        profile: Player = interaction.extras["survival_profile"]
 
         view = ExplorationBiomeSelectView(interaction.user, self.bot)
         view.selector.populate(profile)
@@ -129,7 +128,6 @@ class Survival(commands.Cog):
             color=discord.Color.dark_embed(),
         )
 
-        # TODO: Implement biome discoveries
         # TODO: Implement structures discoveries
 
         for item, quantity, durability in loot:
@@ -139,9 +137,6 @@ class Survival(commands.Cog):
                 quantity=quantity,
                 durability=durability,
             )
-
-
-        await asyncio.sleep(2)
 
         embed.add_field(
             name="Collected Loot",
@@ -153,6 +148,35 @@ class Survival(commands.Cog):
 
         await interaction.edit_original_response(embed=embed)
 
+        discovered_biome = None
+        for _, biome in self.bot.biomes.items():
+            if biome.discovered(profile) or not random.random() < biome.discovery_probability:
+                continue            
+            else:
+                discovered_biome = biome
+                break
+
+        if discovered_biome is None:
+            return
+
+        achievements = profile.get_achievements()
+        achievements.value |= discovered_biome.discovery_achievement
+
+        profile.achievements = achievements.value  # type: ignore
+        await profile.save()
+
+        embed = discord.Embed(
+            title=":sunrise_over_mountains: New biome discovered",
+            description="You just discovered a new biome! Discovering new biomes opens up new loot that can be obtained from exploration.",
+            color=discord.Color.dark_embed(),
+        )
+
+        embed.add_field(name="Biome", value=f"{discovered_biome.emoji} {discovered_biome.display_name}")
+        embed.add_field(name="Information", value=discovered_biome.description)
+        embed.add_field(name="Rarity", value=discovered_biome.rarity.title())
+        embed.set_image(url=discovered_biome.background)
+
+        await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
 
 async def setup(bot: CobbleBot):
     await bot.add_cog(Survival(bot))
