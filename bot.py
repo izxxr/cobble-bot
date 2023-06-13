@@ -23,13 +23,11 @@
 from __future__ import annotations
 
 from core.bot import CobbleBot
-
-import asyncio
-
+from tortoise import run_async  # type: ignore  # pyright dumb
 
 if __name__ == '__main__':
     bot = CobbleBot()
     try:
-        asyncio.run(bot.launch())
+        run_async(bot.launch())
     except KeyboardInterrupt:
         pass
