@@ -22,9 +22,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Optional
 from core.datamodels import Achievements
 from tortoise.models import Model
 from tortoise import fields
+from discord import Embed, Color
+
+if TYPE_CHECKING:
+    from discord import Interaction
+
 
 __all__ = (
     "Player",
@@ -61,3 +67,34 @@ class Player(Model):
         ach = Achievements()
         ach.value = self.achievements
         return ach
+
+    async def add_xp(self, xp: int, interaction: Optional[Interaction] = None) -> bool:
+        """Adds experience points to user.
+
+        Returns True if the user leveled up after addition of XP.
+        """
+        level_up = False
+
+        while not xp <= 0:
+            required = self.get_required_xp()
+
+            if (self.xp + xp) >= required:
+                self.level += 1
+                self.xp = 0
+                xp -= required
+                level_up = True
+            else:
+                self.xp += xp
+                break
+
+        await self.save()
+
+        if interaction is not None and level_up:
+            embed = Embed(
+                title=":arrow_double_up: Level up",
+                description=f"You have advanced to level {self.level}!",
+                color=Color.dark_embed(),
+            )
+            await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
+
+        return level_up

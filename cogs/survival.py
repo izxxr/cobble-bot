@@ -138,20 +138,20 @@ class Survival(commands.Cog):
                 durability=durability,
             )
 
-        embed.add_field(
-            name="Collected Loot",
-            value="\n".join(
-                f"{x[1]}x {x[0].emoji} {x[0].display_name}"
-                for x in loot
-            )
-        )
+        xp_gained = len(loot) * random.randint(1, 3)
+        await profile.add_xp(xp_gained, interaction)
 
+        embed.add_field(name="Collected Loot", value="\n".join(
+                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
+                                                    for x in loot))
+
+        embed.set_footer(text=f"+{xp_gained} XP")
         await interaction.edit_original_response(embed=embed)
 
         discovered_biome = None
         for _, biome in self.bot.biomes.items():
             if biome.discovered(profile) or not random.random() < biome.discovery_probability:
-                continue            
+                continue
             else:
                 discovered_biome = biome
                 break
