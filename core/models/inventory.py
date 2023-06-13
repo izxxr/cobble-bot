@@ -22,7 +22,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union, List
 from tortoise.models import Model
 from tortoise import fields
 
@@ -87,15 +87,19 @@ class InventoryItem(Model):
         item_id: str,
         quantity: int = 1,
         durability: Optional[int] = None,
-    ) -> InventoryItem:
+    ) -> Union[InventoryItem, List[InventoryItem]]:
         if durability is not None:
+            items: List[InventoryItem] = []
             # Anything with durability cannot be stacked
-            return await InventoryItem.create(
-                player=player,
-                item_id=item_id,
-                quantity=1,
-                durability=durability,
-            )
+            for _ in range(quantity):
+                item = await InventoryItem.create(
+                    player=player,
+                    item_id=item_id,
+                    quantity=1,
+                    durability=durability,
+                )
+                items.append(item)
+            return items
         else:
             item = await InventoryItem.filter(player=player, item_id=item_id).first()
             if item is None:
