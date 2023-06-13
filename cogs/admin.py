@@ -61,7 +61,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
             guild = ctx.guild
         else:
             guild = None
-        
+
         commands = await self.bot.tree.sync(guild=guild)
         report = f"Scope: {'Global' if guild is None else 'Guild'}\n" \
                  f"Guild ID: {guild_id}\n" \

@@ -92,6 +92,7 @@ class Profile(commands.GroupCog):
     @checks.has_survival_profile()
     async def view(self, interaction: discord.Interaction) -> None:
         """View your survival profile."""
+        await interaction.response.defer()
         profile = interaction.extras["survival_profile"]
         required_xp = profile.get_required_xp()
 
@@ -116,8 +117,18 @@ class Profile(commands.GroupCog):
             inline=False,
         )
 
+        total = 0
+        discovered = 0
+
+        for biome in self.bot.biomes.values():
+            if biome.discovered(profile):
+                discovered += 1
+            total += 1
+
+        embed.add_field(name="Discovered Biomes", value=f"{discovered}/{total}")
         embed.set_footer(text=f"Survival profile created on {profile.created_at.strftime('%b %d, %Y')}")
-        await interaction.response.send_message(embed=embed)
+
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot: CobbleBot):
