@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Tuple
 from discord.ext import commands
 from discord import app_commands, ui
-from core.models import Player
+from core.models import Player, InventoryItem
 from core import checks, datamodels, views, cosmetics
 
 import discord
@@ -123,17 +123,25 @@ class Survival(commands.Cog):
 
             loot.append((self.bot.items[item_id], quantity, durability))
 
-        await asyncio.sleep(2)
-
         embed = discord.Embed(
             title=f":hiking_boot: Exploration",
             description=f"You explored the **{view.selected_biome.emoji} {view.selected_biome.display_name}**",
             color=discord.Color.dark_embed(),
         )
 
-        # TODO: Add loot to inventory
         # TODO: Implement biome discoveries
         # TODO: Implement structures discoveries
+
+        for item, quantity, durability in loot:
+            await InventoryItem.add(
+                player=profile,
+                item_id=item.id,
+                quantity=quantity,
+                durability=durability,
+            )
+
+
+        await asyncio.sleep(2)
 
         embed.add_field(
             name="Collected Loot",
