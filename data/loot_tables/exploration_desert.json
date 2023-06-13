@@ -8,10 +8,6 @@
         "probability": 0.7,
         "quantity": [2, 10]
     },
-    "oak_wood": {
-        "probability": 0.2,
-        "quantity": [1, 5] 
-    },
     "sand": {
         "probability": 0.9,
         "quantity": [10, 30]
