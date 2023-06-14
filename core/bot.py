@@ -64,8 +64,13 @@ class CobbleCommandTree(app_commands.CommandTree):
             error: app_commands.AppCommandError
         ) -> None:
 
+        if interaction.response.is_done():
+            send = interaction.followup.send
+        else:
+            send = interaction.response.send_message
+
         if isinstance(error, GenericError):
-            await interaction.response.send_message(f'{cosmetics.EMOJI_ERROR} {error.message}')
+            await send(f'{cosmetics.EMOJI_ERROR} {error.message}')
         else:
             raise error
 

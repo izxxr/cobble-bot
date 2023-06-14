@@ -6,13 +6,13 @@
         "description": "Sticks made of wood. Looks like they can be helpful for tools...",
         "emoji": "<:minecraft_stick:1118050565499392000>",
         "crafting_recipe": {
-            "wood": 2
+            "oak_wood": 2
         }
     },
     "string": {
         "display_name": "String",
         "rarity": "common",
-        "type": "drops",
+        "type": "materials",
         "description": "Somewhat elastic strings.",
         "emoji": "<:minecraft_string:1118051859773522020>"
     },
@@ -26,14 +26,14 @@
     "bone": {
         "display_name": "Bone",
         "rarity": "common",
-        "type": "drops",
+        "type": "materials",
         "description": "Dense piece of bone, doesn't look like from a human though...",
         "emoji": "<:minecraft_bone:1118051848025292871>"
     },
     "cactus": {
         "display_name": "Cactus",
         "rarity": "common",
-        "type": "materials",
+        "type": "nature",
         "description": "Cactus plant, doesn't look too good to hold.",
         "emoji": "<:minecraft_cactus:1118051843172474880>"
     },
@@ -86,6 +86,7 @@
             "sticks": 3,
             "string": 2
         },
-        "emoji": "<:minecraft_fishing_rod:1118051817830486057>"
+        "emoji": "<:minecraft_fishing_rod:1118051817830486057>",
+        "durability": 15
     }
 }
