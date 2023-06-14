@@ -109,6 +109,12 @@ class Survival(commands.Cog):
 
         await interaction.edit_original_response(embed=embed, view=None)
 
+        hp = random.choice((0, 0.5))
+        dead = await profile.remove_hp(hp, interaction, "You died while exploring the secrets that shouldn't be explored.")
+
+        if dead:
+            return await interaction.delete_original_response()
+
         assert view.selected_biome is not None
         loot_table = self.bot.loot_tables["exploration_" + view.selected_biome.id]
 

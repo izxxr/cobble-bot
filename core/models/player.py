@@ -23,10 +23,11 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
-from core.datamodels import Achievements
+from core.datamodels import Achievements, PlayerFlags
 from tortoise.models import Model
 from tortoise import fields
 from discord import Embed, Color
+from core import cosmetics, utils
 
 if TYPE_CHECKING:
     from discord import Interaction
@@ -58,6 +59,9 @@ class Player(Model):
     achievements = fields.BigIntField(default=0)
     """The  achievements of user."""
 
+    flags = fields.BigIntField(default=0)
+    """Internal player flags."""
+
     def get_required_xp(self) -> int:
         """Returns the required XP to level up."""
         return self.level * 100
@@ -67,6 +71,12 @@ class Player(Model):
         ach = Achievements()
         ach.value = self.achievements
         return ach
+
+    def get_flags(self) -> PlayerFlags:
+        """Returns the flags a user has."""
+        flags = PlayerFlags()
+        flags.value = self.flags
+        return flags
 
     async def add_xp(self, xp: int, interaction: Optional[Interaction] = None) -> bool:
         """Adds experience points to user.
@@ -98,3 +108,68 @@ class Player(Model):
             await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
 
         return level_up
+
+    async def add_hp(self, hp: int) -> None:
+        """Adds HP to player"""
+        self.health += hp
+
+        # Ensure we don't exceed max health
+        if self.health > 8:
+            self.health = 8
+
+        await self.save()
+
+
+    async def remove_hp(
+            self,
+            hp: float,
+            interaction: Optional[Interaction] = None,
+            death_message: Optional[str] = None,
+        ) -> bool:
+        """Removes HP from the player. Returns True if the health dropped to zero (player died)."""
+        died = False
+        if (self.health - hp) <= 0:
+            self.health = 8
+            died = True
+        else:
+            self.health -= hp
+
+
+        if interaction and died:
+            embed = Embed(
+                title=f"{cosmetics.EMOJI_HEALTH_HALF} You died!",
+                description=death_message or "You ran out of health.",
+                color=Color.red(),  
+            )
+
+            flags = self.get_flags()
+
+            if not flags.died_once:
+                embed.add_field(
+                    name="Tip",
+                    value=f"As you progress through your survival journey, various actions such as " \
+                          f"exploring or mining etc. will decrease your health. Once it drops to zero, you die. " \
+                          "To avoid this, **always eat food to restore your health points.** You can use `/profile view` " \
+                          "command to view your health.",
+                    inline=False,
+                )
+
+                flags.died_once = True
+                self.flags = flags.value
+
+            embed.add_field(
+                name="Statistics",
+                value=f"**Level {self.level}**\n{utils.progress_bar(self.xp, self.get_required_xp())} " \
+                      f"({self.xp}/{self.get_required_xp()})"
+            )
+
+            embed.set_footer(text="The level and XP statistics reset upon dying.")
+            await interaction.followup.send(embed=embed)
+
+        if died:
+            self.level = 1
+            self.xp = 0
+
+
+        await self.save()
+        return died

@@ -26,6 +26,7 @@ from discord.flags import BaseFlags, flag_value, fill_with_flags
 
 __all__ = (
     'Achievements',
+    'PlayerFlags',
 )
 
 
@@ -42,3 +43,13 @@ class Achievements(BaseFlags):
     def discovered_biome_ocean(self) -> int:
         """Discover the ocean biome."""
         return 1 << 1
+
+
+@fill_with_flags()
+class PlayerFlags(BaseFlags):
+    """Represents the flags a user has."""
+
+    @flag_value
+    def died_once(self) -> int:
+        """The player has died at least once."""
+        return 1 << 0
