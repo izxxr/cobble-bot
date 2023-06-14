@@ -44,17 +44,18 @@ class InventoryViewSource(menus.ListPageSource):
             color=discord.Color.dark_embed(),
         )
         embed.set_author(name=menu.interaction.user.display_name, icon_url=menu.interaction.user.display_avatar.url)
+        assert embed.description is not None
 
-        if menu.current_page == 0:
-            assert embed.description is not None
+        embed.description += "\n".join((
+            f"{menu.first_page.emoji} Move to first page",
+            f"{menu.prev_page.emoji} Move to previous page",
+            f"{menu.stop_page.emoji} Stop the pagination",
+            f"{menu.next_page.emoji} Move to next page",
+            f"{menu.last_page.emoji} Move to last page",
+        ))
 
-            embed.description += "\n".join((
-                f"{menu.first_page.emoji} Move to first page",
-                f"{menu.prev_page.emoji} Move to previous page",
-                f"{menu.stop_page.emoji} Stop the pagination",
-                f"{menu.next_page.emoji} Move to next page",
-                f"{menu.last_page.emoji} Move to last page",
-            ))
+        embed.description += "\n"
+        embed.description += "\u2800" * 36
 
         for inv_item in page:
             item = menu.bot.items[inv_item.item_id]
@@ -63,7 +64,7 @@ class InventoryViewSource(menus.ListPageSource):
             if item.durability is not None:
                 stats += f"Durability: {inv_item.durability}/{item.durability}"
 
-            embed.add_field(name=f"{item.emoji} {item.display_name}", value=stats, inline=False)
+            embed.add_field(name=f"{item.emoji} {item.display_name}", value=stats, inline=True)
 
         return embed
 
@@ -82,7 +83,7 @@ class Inventory(commands.GroupCog):
         if len(items) == 0:
             return await interaction.response.send_message(f"{cosmetics.EMOJI_WARNING} Nothing to show yet. The inventory is empty.")
 
-        source = InventoryViewSource(items, per_page=5)
+        source = InventoryViewSource(items, per_page=6)
         paginator = views.Paginator(timeout=60.0, bot=self.bot, user=interaction.user, source=source)
         await paginator.start_pagination(interaction)
 
