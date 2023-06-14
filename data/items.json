@@ -7,7 +7,8 @@
         "emoji": "<:minecraft_stick:1118050565499392000>",
         "crafting_recipe": {
             "oak_wood": 2
-        }
+        },
+        "crafting_quantity": 4
     },
     "string": {
         "display_name": "String",

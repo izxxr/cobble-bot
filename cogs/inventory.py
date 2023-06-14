@@ -200,12 +200,75 @@ class Inventory(commands.GroupCog):
 
         await msg.edit(content=message, embed=None, view=None)
 
+    @app_commands.command()
+    @checks.has_survival_profile()
+    async def craft(self, interaction: discord.Interaction, item: str, quantity: int = 1):
+        """Craft an item.
+
+        Parameters
+        ----------
+        item:
+            The name of item.
+        quantity:
+            The amount to craft. Defaults to 1.
+        """
+        embed = discord.Embed(title="<a:minecraft_crafting_table_working:1118527217400549466> Crafting...")
+        await interaction.response.send_message(embed=embed)
+
+        item = item.lower().replace(" ", "_")
+
+        if item not in self.bot.items:
+            raise checks.GenericError("Unknown item name provided.")
+
+        item_data = self.bot.items[item]
+        profile = interaction.extras["survival_profile"]
+
+        if item_data.crafting_recipe is None:
+            raise checks.GenericError("This item is not craftable.")
+
+        for item_id, crafting_quantity in item_data.crafting_recipe.items():
+            required_item_data = self.bot.items[item_id]
+            required_item = await InventoryItem.filter(
+                player=profile,
+                item_id=item_id,
+            ).first()
+
+            error_message = ""
+            if required_item is None:
+                error_message = f"{cosmetics.EMOJI_WARNING} You need `{crafting_quantity}` **{required_item_data.emoji} " \
+                                f"{required_item_data.display_name}**. You have none."
+            else:
+                required_quantity = crafting_quantity * quantity
+                if required_quantity > required_item.quantity:
+                    error_message = f"{cosmetics.EMOJI_WARNING} You need `{required_quantity}` {required_item_data.emoji} " \
+                                    f"{required_item_data.display_name}. You currently have `{required_item.quantity}` of it."
+                else:
+                    await required_item.remove(required_quantity)
+
+            if error_message:
+                return await interaction.edit_original_response(content=error_message, embed=None)
+
+        # At this point, all conditions have been passed and player should be eligible to
+        # craft the given item so add it to inventory.
+        quantity_crafted = quantity * item_data.crafting_quantity
+        await InventoryItem.add(player=profile, item_id=item, quantity=quantity_crafted)
+        await interaction.edit_original_response(content=f":carpentry_saw: Crafted `{quantity_crafted}` **{item_data.emoji} {item_data.display_name}**", embed=None)
+
+    @craft.autocomplete("item")
+    async def autocomplete_item_name_craftable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=f"{item.display_name}", value=item_id)
+            for item_id, item in self.bot.items.items()
+            if current.lower() in item.display_name.lower() and item.crafting_recipe
+        ]
+
     @info.autocomplete("item")
     @discard.autocomplete("item")
     async def autocomplete_item_name(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
         return [
             app_commands.Choice(name=f"{item.display_name}", value=item_id)
-            for item_id, item in self.bot.items.items() if current.lower() in item.display_name.lower()
+            for item_id, item in self.bot.items.items()
+            if current.lower() in item.display_name.lower()
         ]
 
 async def setup(bot: CobbleBot):

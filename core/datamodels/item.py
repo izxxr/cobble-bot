@@ -43,3 +43,4 @@ class Item:
     crafting_recipe: Optional[Dict[str, int]] = None
     smelting_recipe: Optional[str] = None
     durability: Optional[int] = None
+    crafting_quantity: int = 1
