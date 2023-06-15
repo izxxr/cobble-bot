@@ -129,6 +129,10 @@ class Inventory(commands.GroupCog):
                 ),
                 inline=False,
             )
+            embed.add_field(
+                name="Crafted Quantity",
+                value=str(data.crafting_quantity),
+            )
 
         if data.smelting_recipe is not None:
             reqitem = self.bot.items[data.smelting_recipe]

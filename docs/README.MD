@@ -8,7 +8,10 @@ modify its behaviour for personal use cases.
 
 The pages are documented below:
 
-- [General Features](bot-features)
-    - [Player Profile](bot-features/player-profile.md)
-    - [Leveling](bot-features/leveling.md)
-    - [Health](bot-features/health.md)
+- [General Features](docs/bot-features)
+    - [Player Profile](docs/bot-features/player-profile.md)
+    - [Leveling](docs/bot-features/leveling.md)
+    - [Health](docs/bot-features/health.md)
+    - [Inventory and Crafting](docs/bot-features/inventory-and-crafting.md)
+    - [Biomes and Exploration](docs/bot-features/biomes-and-exploration.md)
+    - [Fishing](docs/bot-features)
