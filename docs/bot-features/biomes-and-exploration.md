@@ -35,6 +35,6 @@ no loot is obtained.
 The loot obtained from exploration varies depending on the biome explored. Following loot tables
 determine the loot obtained along with the probability and quantity of it obtained:
 
-- [exploration_plains.json](data/loot_tables/exploration_plains.json)
-- [exploration_desert.json](data/loot_tables/exploration_desert.json)
-- [exploration_ocean.json](data/loot_tables/exploration_ocean.json)
+- [exploration_plains.json](../../data/loot_tables/exploration_plains.json)
+- [exploration_desert.json](../../data/loot_tables/exploration_desert.json)
+- [exploration_ocean.json](../../data/loot_tables/exploration_ocean.json)

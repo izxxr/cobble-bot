@@ -17,4 +17,4 @@ of loot obtained.
 ## Loot Tables
 The loot obtained from fishing is determined by the following loot table:
 
-- [fishing.json](data/loot_tables/fishing.json)
+- [fishing.json](../../data/loot_tables/fishing.json)
