@@ -3,9 +3,9 @@ Minecraft inspired bot bringing fun survival experience to Discord.
 
 Cobble is under active development and is not ready yet.
 
-**Planned Features:**
+**Planned Features (so far):**
 - [x] Discoverable biomes and exploration
-- [ ] Inventory system with crafting and smelting
-- [ ] Charms (similar to enchantments but are applied temporarily on player and provide perks while applied)
+- [x] Inventory system with crafting and smelting
+- [x] Fishing
 - [ ] Mining
-- [ ] Fishing
+- [ ] Charms (similar to enchantments but applied temporarily to player and provide perks while applied)
