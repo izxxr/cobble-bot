@@ -62,7 +62,7 @@ class InventoryItem(Model):
         else:
             self.durability += durability
             await self.save()
-    
+
         return False
 
     async def remove(self, quantity: int = 1) -> bool:         

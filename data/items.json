@@ -89,5 +89,12 @@
         },
         "emoji": "<:minecraft_fishing_rod:1118051817830486057>",
         "durability": 15
+    },
+    "tropical_fish": {
+        "display_name": "Tropical Fish",
+        "rarity": "rare",
+        "type": "collectibles",
+        "description": "A rare tropical fish.",
+        "emoji": "<:minecraft_tropical_fish:1118774494165745714>"
     }
 }

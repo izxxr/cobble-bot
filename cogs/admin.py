@@ -77,7 +77,7 @@ class Admin(commands.Cog, command_attrs=dict(hidden=True)):
         to reload all extensions.
         """
         if extension == "*":
-            to_reload = self.bot.extensions
+            to_reload = list(self.bot.extensions)
         else:
             to_reload = [extension]
 

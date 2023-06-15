@@ -76,6 +76,44 @@ class Survival(commands.Cog):
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
 
+    async def _process_loot_table(self, profile: Player, table: datamodels.LootTable) -> List[Tuple[datamodels.Item, int, Optional[int]]]:
+        obtained_loot: List[Tuple[datamodels.Item, int, Optional[int]]] = []
+
+        for item_id, item in table.items.items():
+            if not random.random() < item.probability:
+                continue
+            
+            quantity = random.randint(item.quantity[0], item.quantity[1])
+            durability = None
+
+            if item.durability is not None:
+                durability = random.randint(item.durability[0], item.durability[1])
+
+            obtained_loot.append((self.bot.items[item_id], quantity, durability))
+
+        for item, quantity, durability in obtained_loot:
+            await InventoryItem.add(
+                player=profile,
+                item_id=item.id,
+                quantity=quantity,
+                durability=durability,
+            )
+
+        return obtained_loot
+
+    def _item_break_embed(self, item_id: str) -> discord.Embed:
+        item = self.bot.items[item_id]
+        embed = discord.Embed(
+            title=":adhesive_bandage: Item Broken",
+            description=f"Your **{item.emoji} {item.display_name}** just broke.",
+            color=discord.Color.red(),
+        )
+
+        if item.crafting_recipe is not None:
+            embed.set_footer(text="This item can be recrafted.")
+
+        return embed
+
     @app_commands.command()
     @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 600))
     @checks.has_survival_profile()
@@ -117,17 +155,9 @@ class Survival(commands.Cog):
             return await interaction.delete_original_response()
 
         assert view.selected_biome is not None
+
         loot_table = self.bot.loot_tables["exploration_" + view.selected_biome.id]
-
-        loot: List[Tuple[datamodels.Item, int, Optional[int]]] = []
-        for item_id, item in loot_table.items.items():
-            if not random.random() < item.probability:
-                continue
-            
-            quantity = random.randint(item.quantity[0], item.quantity[1])
-            durability = random.randint(item.durability[0], item.durability[1]) if item.durability else None
-
-            loot.append((self.bot.items[item_id], quantity, durability))
+        loot = await self._process_loot_table(profile, loot_table)
 
         embed = discord.Embed(
             title=f":hiking_boot: Exploration",
@@ -135,17 +165,7 @@ class Survival(commands.Cog):
             color=discord.Color.dark_embed(),
         )
 
-        # TODO: Implement structures discoveries
-
-        for item, quantity, durability in loot:
-            await InventoryItem.add(
-                player=profile,
-                item_id=item.id,
-                quantity=quantity,
-                durability=durability,
-            )
-
-        xp_gained = len(loot) * random.randint(1, 3)
+        xp_gained = len(loot) * random.randint(1, 5)
         await profile.add_xp(xp_gained, interaction)
 
         embed.add_field(name="Collected Loot", value="\n".join(
@@ -184,6 +204,46 @@ class Survival(commands.Cog):
         embed.set_image(url=discovered_biome.background)
 
         await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
+
+    @app_commands.command()
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 300))
+    @checks.has_survival_profile()
+    async def fish(self, interaction: discord.Interaction) -> None:
+        """Obtain resources from fishing."""
+        await interaction.response.send_message(
+            embed=discord.Embed(title=f"<a:minecraft_fishing:1118781577418252358> Fishing...")
+        )
+
+        profile = interaction.extras["survival_profile"]
+        invitem = await InventoryItem.filter(player=profile, item_id="fishing_rod").first()
+
+        if invitem is None:
+            fishing_rod = self.bot.items["fishing_rod"]
+            return await interaction.response.send_message(f"{cosmetics.EMOJI_WARNING} You need a **{fishing_rod.emoji} {fishing_rod.display_name}** to fish.")
+
+        loot_table = self.bot.loot_tables["fishing"]
+        obtained_loot = await self._process_loot_table(profile, loot_table)
+        xp_gained = random.randint(1, 3) * len(obtained_loot)
+
+        await profile.add_xp(xp_gained, interaction)
+
+        embed = discord.Embed(
+            title=f":fishing_pole_and_fish: Fishing",
+            description=f"You went for fishing and obtained the following loot",
+            color=discord.Color.dark_embed(),
+        )
+
+        embed.add_field(name="Collected Loot", value="\n".join(
+                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
+                                                    for x in obtained_loot))
+
+        embed.set_footer(text=f"+{xp_gained} XP")
+        await interaction.edit_original_response(embed=embed)
+
+        broken = await invitem.edit_durability(-random.randint(1, 2)*len(obtained_loot))
+        if broken:
+            await interaction.followup.send(embed=self._item_break_embed("fishing_rod"))
+
 
 async def setup(bot: CobbleBot):
     await bot.add_cog(Survival(bot))

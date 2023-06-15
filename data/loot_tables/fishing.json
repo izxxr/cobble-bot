@@ -1,0 +1,28 @@
+{
+    "name": "fishing",
+    "raw_salmon": {
+        "probability": 0.8,
+        "quantity": [2, 10]
+    },
+    "fishing_rod": {
+        "probability": 0.2,
+        "quantity": [1, 1],
+        "durability": [3, 6]
+    },
+    "tropical_fish": {
+        "probability": 0.1,
+        "quantity": [1, 1]
+    },
+    "sticks": {
+        "probability": 0.6,
+        "quantity": [1, 5]
+    },
+    "glass_bottle": {
+        "probability": 0.5,
+        "quantity": [1, 2]
+    },
+    "bone": {
+        "probability": 0.4,
+        "quantity": [1, 5]
+    }
+}

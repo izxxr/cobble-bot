@@ -45,6 +45,7 @@ LOOT_TABLES_PATHS = [
     "data/loot_tables/exploration_plains.json",
     "data/loot_tables/exploration_desert.json",
     "data/loot_tables/exploration_ocean.json",
+    "data/loot_tables/fishing.json"
 ]
 
 
