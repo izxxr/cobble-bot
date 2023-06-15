@@ -251,7 +251,7 @@ class Inventory(commands.GroupCog):
         # At this point, all conditions have been passed and player should be eligible to
         # craft the given item so add it to inventory.
         quantity_crafted = quantity * item_data.crafting_quantity
-        await InventoryItem.add(player=profile, item_id=item, quantity=quantity_crafted)
+        await InventoryItem.add(player=profile, item_id=item, quantity=quantity_crafted, durability=item_data.durability)
         await interaction.edit_original_response(content=f":carpentry_saw: Crafted `{quantity_crafted}` **{item_data.emoji} {item_data.display_name}**", embed=None)
 
     @craft.autocomplete("item")
