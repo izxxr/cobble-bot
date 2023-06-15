@@ -22,16 +22,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from discord import app_commands
 from core.models import Player
 
 if TYPE_CHECKING:
+    from core.bot import CobbleBot
     from discord import Interaction
 
 __all__ = (
     'GenericError',
     'has_survival_profile',
+    'cooldown_factory',
 )
 
 
@@ -53,3 +55,13 @@ def has_survival_profile():
         raise GenericError('No survival profile created yet. Use `/profile start` to create one.')
 
     return app_commands.check(predicate)
+
+
+def cooldown_factory(rate: float, per: float, *, bypass_admin: bool = True):
+    def predicate(interaction: Interaction[CobbleBot]) -> Optional[app_commands.Cooldown]:
+        if bypass_admin and interaction.user.id in interaction.client.config.admin_ids:
+            return None
+
+        return app_commands.Cooldown(rate, per)
+
+    return predicate

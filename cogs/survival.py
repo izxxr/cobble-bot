@@ -77,6 +77,7 @@ class Survival(commands.Cog):
         self.bot = bot
 
     @app_commands.command()
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 600))
     @checks.has_survival_profile()
     async def explore(self, interaction: discord.Interaction):
         """Explore different biomes and collect valuables and other resources."""

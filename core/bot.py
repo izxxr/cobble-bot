@@ -71,6 +71,14 @@ class CobbleCommandTree(app_commands.CommandTree):
 
         if isinstance(error, GenericError):
             await send(f'{cosmetics.EMOJI_ERROR} {error.message}')
+        elif isinstance(error, app_commands.CommandOnCooldown):
+            minutes, seconds = divmod(round(error.retry_after), 60)
+            if minutes == 0:
+                message = f"you retry in **{seconds} seconds**."
+            else:
+                message = f"you can retry in **{minutes} minutes {seconds} seconds**."
+
+            await send(f':timer: This command is on cooldown, {message}')
         else:
             raise error
 
