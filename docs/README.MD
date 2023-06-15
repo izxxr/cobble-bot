@@ -9,7 +9,7 @@ modify its behaviour for personal use cases.
 The pages are documented below:
 
 - [General Features](bot-features)
-    - [Player Profile](bot-features/player-profile.md)
+    - [Player Profile](bot-features/player-profiles.md)
     - [Leveling](bot-features/leveling.md)
     - [Health](bot-features/health.md)
     - [Inventory and Crafting](bot-features/inventory-and-crafting.md)
