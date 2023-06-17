@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class Misc(commands.Cog):
-    """Administrative commands for managing bot's behaviour. (Developer only)"""
+    """Other commands related to bot's information and data."""
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
 
