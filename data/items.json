@@ -90,6 +90,42 @@
         "smelting_recipe": "raw_salmon",
         "food_hp_restored": 3
     },
+    "raw_beef": {
+        "display_name": "Raw Beef",
+        "rarity": "common",
+        "type": "food",
+        "description": "Raw cow meat",
+        "emoji": "<:minecraft_raw_beef:1119521056013697024>",
+        "food_hp_restored": 1,
+        "smelting_product": "cooked_beef"
+    },
+    "cooked_beef": {
+        "display_name": "Cooked Beef",
+        "rarity": "common",
+        "type": "food",
+        "description": "Briefly cooked beef.",
+        "emoji": "<:minecraft_cooked_beef:1119521035239305307>",
+        "smelting_recipe": "raw_beef",
+        "food_hp_restored": 5
+    },
+    "raw_chicken": {
+        "display_name": "Raw Chicken",
+        "rarity": "common",
+        "type": "food",
+        "description": "Raw chicken meat",
+        "emoji": "<:minecraft_raw_chicken:1119521015903559690>",
+        "food_hp_restored": 1,
+        "smelting_product": "cooked_chicken"
+    },
+    "cooked_chicken": {
+        "display_name": "Cooked Chicken",
+        "rarity": "common",
+        "type": "food",
+        "description": "Briefly cooked chicken.",
+        "emoji": "<:minecraft_cooked_chicken:1119521025273643139>",
+        "smelting_recipe": "raw_chicken",
+        "food_hp_restored": 4
+    },
     "fishing_rod": {
         "display_name": "Fishing Rod",
         "rarity": "common",
