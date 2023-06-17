@@ -236,7 +236,7 @@ class Survival(commands.Cog):
     @app_commands.command()
     @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 300))
     @checks.has_survival_profile()
-    async def fish(self, interaction: discord.Interaction) -> None:
+    async def fish(self, interaction: discord.Interaction):
         """Obtain resources from fishing."""
         await interaction.response.send_message(
             embed=discord.Embed(title=f"<a:minecraft_fishing:1118781577418252358> Fishing...")
@@ -247,7 +247,10 @@ class Survival(commands.Cog):
 
         if invitem is None:
             fishing_rod = self.bot.items["fishing_rod"]
-            return await interaction.response.send_message(f"{cosmetics.EMOJI_WARNING} You need a **{fishing_rod.emoji} {fishing_rod.display_name}** to fish.")
+            return await interaction.edit_original_response(
+                content=f"{cosmetics.EMOJI_WARNING} You need a **{fishing_rod.emoji} {fishing_rod.display_name}** to fish.",
+                embed=None,
+            )
 
         loot_table = self.bot.loot_tables["fishing"]
         obtained_loot = await self._process_loot_table(profile, loot_table)

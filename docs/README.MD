@@ -8,7 +8,7 @@ modify its behaviour for personal use cases.
 
 The pages are documented below:
 
-- [General Features](bot-features)
+- [General Features](bot-features/)
     - [Player Profile](bot-features/player-profiles.md)
     - [Leveling](bot-features/leveling.md)
     - [Health](bot-features/health.md)
@@ -16,3 +16,7 @@ The pages are documented below:
     - [Biomes and Exploration](bot-features/biomes-and-exploration.md)
     - [Fishing](bot-features/fishing.md)
     - [Mining](bot-features/mining.md)
+
+- [Advanced/Behavioural Features](advanced/)
+    - [JSON files](advanced/json-files.md)
+    - [Loot Tables](advanced/loot-tables.md)
