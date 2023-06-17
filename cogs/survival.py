@@ -268,6 +268,7 @@ class Survival(commands.Cog):
 
     @app_commands.command()
     @checks.has_survival_profile()
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 1800))
     async def mine(self, interaction: discord.Interaction):
         """Go for mining to collect minerals and other resources."""
         await interaction.response.defer()

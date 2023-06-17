@@ -19,7 +19,7 @@ The `/inventory info` command shows information about an item regardless of whet
 is present in inventory or not. The information includes crafting recipe and other metadata
 about the item.
 
-## Crafting items
+## Crafting
 Certain items are able to be crafted. Crafting takes a specific number of raw materials and in
 cost of those materials, provide a final crafted item as product.
 
@@ -32,3 +32,20 @@ The quantity argument determines the number of craftings to perform. The final a
 obtained is `quantity * crafting_quantity`. For example, two oak woods produce four sticks. If the
 command `/inventory craft item: sticks quantity: 2` is ran, it would use up four oak woods and
 produce 8 sticks.
+
+## Smelting
+Certain items can be cooked or smelted. Ores are smelted to obtain the relevant mineral such as
+iron and gold. Raw food items are cooked or smelted to give cooked items that are more generally
+more effective than raw items.
+
+`/inventory smelt` command is used to smelt items. The first argument is the item to smelt such
+as an ore or food item and the second argument is the quantity of it to smelt.
+
+Smelting anything requires coal which is obtained through mining. One piece of coal can up to
+smelt four items.
+
+Regardless of amount of items smelted, player gains 1-5 experience points.
+
+## Using items
+Certain items can be used. Eating food items is an example of using items. In order to use
+an item, `/inventory use` command is used followed by the item to use and the quantity to use.
