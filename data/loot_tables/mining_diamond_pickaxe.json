@@ -1,0 +1,23 @@
+{
+    "name": "mining_diamond_pickaxe",
+    "stone": {
+        "probability": 1,
+        "quantity": [30, 50]
+    },
+    "coal": {
+        "probability": 0.8,
+        "quantity": [20, 30]
+    },
+    "iron_ore": {
+        "probability": 0.6,
+        "quantity": [10, 20]
+    },
+    "gold_ore": {
+        "probability": 0.5,
+        "quantity": [5, 15]
+    },
+    "diamond": {
+        "probability": 0.2,
+        "quantity": [1, 4]
+    }
+}

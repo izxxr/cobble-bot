@@ -193,6 +193,29 @@
         "emoji": "<:minecraft_iron_ingot:1118989521032314921>",
         "smelting_recipe": "iron_ore"
     },
+    "gold_ore": {
+        "display_name": "Gold Ore",
+        "rarity": "uncommon",
+        "type": "minerals",
+        "description": "Gold containing ore. Could be smelted to obtain gold.",
+        "emoji": "<:minecraft_gold_ore:1118989537184583740>",
+        "smelting_product": "gold_ingot"
+    },
+    "gold_ingot": {
+        "display_name": "Gold Ingot",
+        "rarity": "common",
+        "type": "minerals",
+        "description": "An oblong ingot of gold.",
+        "emoji": "<:minecraft_gold_ingot:1118989548052037634>",
+        "smelting_recipe": "gold_ore"
+    },
+    "diamond": {
+        "display_name": "Diamond",
+        "rarity": "rare",
+        "type": "minerals",
+        "description": "Rare and shiny diamond.",
+        "emoji": "<:minecraft_diamond:1118989526233251860>"
+    },
     "wooden_pickaxe": {
         "display_name": "Wooden Pickaxe",
         "rarity": "common",
@@ -214,6 +237,42 @@
         "durability": 15,
         "crafting_recipe": {
             "stone": 3,
+            "sticks": 2
+        }
+    },
+    "iron_pickaxe": {
+        "display_name": "Iron Pickaxe",
+        "rarity": "common",
+        "type": "tools",
+        "description": "A strong pickaxe made up of iron.",
+        "emoji": "<:minecraft_iron_pickaxe:1118988130150776984>",
+        "durability": 25,
+        "crafting_recipe": {
+            "iron_ingot": 3,
+            "sticks": 2
+        }
+    },
+    "gold_pickaxe": {
+        "display_name": "Gold Pickaxe",
+        "rarity": "uncommon",
+        "type": "tools",
+        "description": "A rather brittle pickaxe made up of gold.",
+        "emoji": "<:minecraft_gold_pickaxe:1118988125058896022>",
+        "durability": 5,
+        "crafting_recipe": {
+            "gold_ingot": 3,
+            "sticks": 2
+        }
+    },
+    "diamond_pickaxe": {
+        "display_name": "Diamond Pickaxe",
+        "rarity": "rare",
+        "type": "tools",
+        "description": "A strong and durable pickaxe made up of diamond.",
+        "emoji": "<:minecraft_diamond_pickaxe:1118988119635656856>",
+        "durability": 40,
+        "crafting_recipe": {
+            "diamond": 3,
             "sticks": 2
         }
     }

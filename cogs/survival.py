@@ -41,9 +41,14 @@ if TYPE_CHECKING:
 # Sorted by priority (lowest -> highest)
 # e.g. if a player has both wooden and stone pickaxe in their inventory
 # stone pickaxe would be used for mining as it takes higher priority.
+# Also note that though gold tools are weak, they still follow the normal
+# priority order (so essentially, if one doesn't want gold tools used, discard them).
 PICKAXES_IDS = (
     "wooden_pickaxe",
     "stone_pickaxe",
+    "iron_pickaxe",
+    "gold_pickaxe",
+    "diamond_pickaxe",
 )
 
 

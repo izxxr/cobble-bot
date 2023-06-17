@@ -48,6 +48,9 @@ LOOT_TABLES_PATHS = [
     "data/loot_tables/fishing.json",
     "data/loot_tables/mining_wooden_pickaxe.json",
     "data/loot_tables/mining_stone_pickaxe.json",
+    "data/loot_tables/mining_iron_pickaxe.json",
+    "data/loot_tables/mining_gold_pickaxe.json",
+    "data/loot_tables/mining_diamond_pickaxe.json",
 ]
 
 
