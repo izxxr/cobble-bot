@@ -1,0 +1,15 @@
+{
+    "name": "mining_stone_pickaxe",
+    "stone": {
+        "probability": 1,
+        "quantity": [10, 30]
+    },
+    "coal": {
+        "probability": 0.7,
+        "quantity": [3, 10]
+    },
+    "iron_ore": {
+        "probability": 0.5,
+        "quantity": [3, 10]
+    }
+}

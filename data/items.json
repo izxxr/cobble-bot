@@ -96,5 +96,58 @@
         "type": "collectibles",
         "description": "A rare tropical fish.",
         "emoji": "<:minecraft_tropical_fish:1118774494165745714>"
+    },
+    "stone": {
+        "display_name": "Stone",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Strong and durable piece of stone",
+        "emoji": "<:minecraft_stone:1118989822833463396>"
+    },
+    "coal": {
+        "display_name": "Coal",
+        "rarity": "common",
+        "type": "minerals",
+        "description": "A dark brown, combustible piece of coal. Could use this as fuel.",
+        "emoji": "<:minecraft_coal:1118989531304177815>"
+    },
+    "iron_ore": {
+        "display_name": "Iron Ore",
+        "rarity": "common",
+        "type": "minerals",
+        "description": "Iron containing ore. Could be smelted to obtain iron.",
+        "emoji": "<:minecraft_iron_ore:1118989542356168734>"
+    },
+    "iron_ingot": {
+        "display_name": "Iron Ingot",
+        "rarity": "common",
+        "type": "minerals",
+        "description": "An oblong ingot of iron.",
+        "emoji": "<:minecraft_iron_ingot:1118989521032314921>",
+        "smelting_recipe": "iron_ore"
+    },
+    "wooden_pickaxe": {
+        "display_name": "Wooden Pickaxe",
+        "rarity": "common",
+        "type": "tools",
+        "description": "A weak pickaxe made up of wood.",
+        "emoji": "<:minecraft_wood_pickaxe:1118988135334940732>",
+        "durability": 10,
+        "crafting_recipe": {
+            "oak_wood": 3,
+            "sticks": 2
+        }
+    },
+    "stone_pickaxe": {
+        "display_name": "Stone Pickaxe",
+        "rarity": "common",
+        "type": "tools",
+        "description": "A relatively durable pickaxe made up of stone.",
+        "emoji": "<:minecraft_stone_pickaxe:1118990249389994005>",
+        "durability": 15,
+        "crafting_recipe": {
+            "stone": 3,
+            "sticks": 2
+        }
     }
 }

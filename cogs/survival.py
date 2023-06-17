@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Tuple
 from discord.ext import commands
 from discord import app_commands, ui
+from tortoise.expressions import Q
 from core.models import Player, InventoryItem
 from core import checks, datamodels, views, cosmetics
 
@@ -33,6 +34,17 @@ import random
 
 if TYPE_CHECKING:
     from core.bot import CobbleBot
+
+    ObtainedLootT = List[Tuple[datamodels.Item, int, Optional[int]]]
+
+
+# Sorted by priority (lowest -> highest)
+# e.g. if a player has both wooden and stone pickaxe in their inventory
+# stone pickaxe would be used for mining as it takes higher priority.
+PICKAXES_IDS = (
+    "wooden_pickaxe",
+    "stone_pickaxe",
+)
 
 
 class ExplorationBiomeSelectView(views.AuthorizedView):
@@ -76,8 +88,8 @@ class Survival(commands.Cog):
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
 
-    async def _process_loot_table(self, profile: Player, table: datamodels.LootTable) -> List[Tuple[datamodels.Item, int, Optional[int]]]:
-        obtained_loot: List[Tuple[datamodels.Item, int, Optional[int]]] = []
+    async def _process_loot_table(self, profile: Player, table: datamodels.LootTable) -> ObtainedLootT:
+        obtained_loot: ObtainedLootT = []
 
         for item_id, item in table.items.items():
             if not random.random() < item.probability:
@@ -100,6 +112,22 @@ class Survival(commands.Cog):
             )
 
         return obtained_loot
+
+    def _generate_loot_embed(self, loot: ObtainedLootT, title: str, description: str, xp_gained: Optional[int] = None) -> discord.Embed:
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=discord.Color.dark_embed(),
+        )
+
+        embed.add_field(name="Collected Loot", value="\n".join(
+                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
+                                                    for x in loot))
+
+        if xp_gained:
+            embed.set_footer(text=f"+{xp_gained} XP")
+
+        return embed
 
     def _item_break_embed(self, item_id: str) -> discord.Embed:
         item = self.bot.items[item_id]
@@ -158,22 +186,17 @@ class Survival(commands.Cog):
 
         loot_table = self.bot.loot_tables["exploration_" + view.selected_biome.id]
         loot = await self._process_loot_table(profile, loot_table)
+        xp_gained = len(loot) * random.randint(1, 5)
 
-        embed = discord.Embed(
-            title=f":hiking_boot: Exploration",
+        embed = self._generate_loot_embed(
+            loot,
+            title=":hiking_boot: Exploration",
             description=f"You explored the **{view.selected_biome.emoji} {view.selected_biome.display_name}**",
-            color=discord.Color.dark_embed(),
+            xp_gained=xp_gained,
         )
 
-        xp_gained = len(loot) * random.randint(1, 5)
-        await profile.add_xp(xp_gained, interaction)
-
-        embed.add_field(name="Collected Loot", value="\n".join(
-                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
-                                                    for x in loot))
-
-        embed.set_footer(text=f"+{xp_gained} XP")
         await interaction.edit_original_response(embed=embed)
+        await profile.add_xp(xp_gained, interaction)
 
         discovered_biome = None
         for _, biome in self.bot.biomes.items():
@@ -224,26 +247,61 @@ class Survival(commands.Cog):
         loot_table = self.bot.loot_tables["fishing"]
         obtained_loot = await self._process_loot_table(profile, loot_table)
         xp_gained = random.randint(1, 3) * len(obtained_loot)
-
-        await profile.add_xp(xp_gained, interaction)
-
-        embed = discord.Embed(
-            title=f":fishing_pole_and_fish: Fishing",
-            description=f"You went for fishing and obtained the following loot",
-            color=discord.Color.dark_embed(),
+        embed = self._generate_loot_embed(
+            obtained_loot,
+            title=":fishing_pole_and_fish: Fishing",
+            description="You went for fishing and obtained the following loot",
+            xp_gained=xp_gained,
         )
 
-        embed.add_field(name="Collected Loot", value="\n".join(
-                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
-                                                    for x in obtained_loot))
-
-        embed.set_footer(text=f"+{xp_gained} XP")
         await interaction.edit_original_response(embed=embed)
+        await profile.add_xp(xp_gained, interaction)
 
         broken = await invitem.edit_durability(-random.randint(1, 2)*len(obtained_loot))
         if broken:
             await interaction.followup.send(embed=self._item_break_embed("fishing_rod"))
 
+    @app_commands.command()
+    @checks.has_survival_profile()
+    async def mine(self, interaction: discord.Interaction):
+        """Go for mining to collect minerals and other resources."""
+        await interaction.response.defer()
+
+        player: Player = interaction.extras["survival_profile"]
+
+        pickaxes = await InventoryItem.filter(Q(item_id__in=PICKAXES_IDS), player=player)
+        pickaxes.sort(key=lambda x: PICKAXES_IDS.index(x.item_id))
+
+        if not pickaxes:
+            raise checks.GenericError("You must have a pickaxe in order to mine.")
+
+        await interaction.followup.send(
+            embed=discord.Embed(title="<a:minecraft_mining:1119496609835786240> Mining...")
+        )
+
+        died = await player.remove_hp(random.choice((0.5, 1)), interaction, death_message="You died while mining deep down in the caves.")
+        if died:
+            return await interaction.delete_original_response()
+
+        pickaxe = pickaxes[-1]  # pickaxes list is sorted by priority (lowest -> highest)
+
+        table = self.bot.loot_tables["mining_" + pickaxe.item_id]
+        loot = await self._process_loot_table(player, table)
+        xp_gained = random.randint(1, 3) * len(loot)
+
+        embed = self._generate_loot_embed(
+            loot=loot,
+            title=":pick: Mining",
+            description="You went for mining and collected the following loot.",
+            xp_gained=xp_gained,
+        )
+
+        await interaction.edit_original_response(embed=embed)
+        await player.add_xp(xp_gained, interaction)
+    
+        broken = await pickaxe.edit_durability(-random.randint(1, 2)*len(loot))
+        if broken:
+            await interaction.followup.send(embed=self._item_break_embed(pickaxe.item_id))
 
 async def setup(bot: CobbleBot):
     await bot.add_cog(Survival(bot))
