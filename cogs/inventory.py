@@ -162,6 +162,14 @@ class Inventory(commands.GroupCog):
                 inline=False,
             )
 
+        if data.smelting_product is not None:
+            reqitem = self.bot.items[data.smelting_product]
+            embed.add_field(
+                name="Smelting Product",
+                value=f"{reqitem.emoji} {reqitem.display_name}",
+                inline=False,
+            )
+
         if other_info:
             embed.add_field(name="Other Information", value=other_info, inline=False)
 
