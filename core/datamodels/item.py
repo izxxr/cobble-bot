@@ -42,5 +42,6 @@ class Item:
     emoji: str
     crafting_recipe: Optional[Dict[str, int]] = None
     smelting_recipe: Optional[str] = None
+    smelting_product: Optional[str] = None
     durability: Optional[int] = None
     crafting_quantity: int = 1

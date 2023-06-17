@@ -43,15 +43,16 @@
         "rarity": "common",
         "type": "materials",
         "description": "Sand, Nothing too special about it.",
-        "emoji": "<:minecraft_sand:1118035607239802920>"
+        "emoji": "<:minecraft_sand:1118035607239802920>",
+        "smelting_product": "glass"
     },
     "glass": {
         "display_name": "Glass",
         "rarity": "common",
         "type": "materials",
-        "smelting_recipe": "sand",
         "description": "Normal looking glass",
-        "emoji": "<:minecraft_glass:1118051834997780541>"
+        "emoji": "<:minecraft_glass:1118051834997780541>",
+        "smelting_recipe": "sand"
     },
     "glass_bottle": {
         "display_name": "Glass Bottle",
@@ -116,7 +117,8 @@
         "rarity": "common",
         "type": "minerals",
         "description": "Iron containing ore. Could be smelted to obtain iron.",
-        "emoji": "<:minecraft_iron_ore:1118989542356168734>"
+        "emoji": "<:minecraft_iron_ore:1118989542356168734>",
+        "smelting_product": "iron_ingot"
     },
     "iron_ingot": {
         "display_name": "Iron Ingot",

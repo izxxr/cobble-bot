@@ -25,14 +25,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 from discord import app_commands
 from discord.ext import commands, menus
-from core.models import InventoryItem
+from core.models import InventoryItem, Player
 from core import checks, views, cosmetics
 
+import math
+import random
 import discord
 
 if TYPE_CHECKING:
     from core.bot import CobbleBot
-
 
 class InventoryViewSource(menus.ListPageSource):
     bot: CobbleBot
@@ -257,6 +258,89 @@ class Inventory(commands.GroupCog):
         quantity_crafted = quantity * item_data.crafting_quantity
         await InventoryItem.add(player=profile, item_id=item, quantity=quantity_crafted, durability=item_data.durability)
         await interaction.edit_original_response(content=f":carpentry_saw: Crafted `{quantity_crafted}` **{item_data.emoji} {item_data.display_name}**", embed=None)
+
+    @app_commands.command()
+    @checks.has_survival_profile()
+    async def smelt(self, interaction: discord.Interaction, item: str, quantity: int = 1):
+        """Smelts an item.
+
+        Parameters
+        ----------
+        item:
+            The name of item to smelt.
+        quantity:
+            The amount to smelt. Defaults to 1.
+        """
+        item = item.lower().replace(" ", "_")
+
+        if item not in self.bot.items:
+            raise checks.GenericError("Unknown item name provided.")
+
+        data = self.bot.items[item]
+        if data.smelting_product is None:
+            raise checks.GenericError("This item cannot be smelted.")
+
+        embed = discord.Embed(title="<a:minecraft_lit_furnace_blink:1119501606988296192> Smelting...")
+        await interaction.response.send_message(embed=embed)
+
+        profile: Player = interaction.extras["survival_profile"]
+        inv_item = await InventoryItem.filter(player=profile, item_id=item).first()
+
+        if inv_item is None:
+            return await interaction.edit_original_response(
+                content=f"{cosmetics.EMOJI_WARNING} You don't have this item.",
+                embed=None,
+            )
+        if inv_item.quantity < quantity:
+            return await interaction.edit_original_response(
+                content=f"{cosmetics.EMOJI_WARNING} You only have `{inv_item.quantity}` **{data.emoji} {data.display_name}**.",
+                embed=None,
+            )
+
+        item_formed = self.bot.items[data.smelting_product]
+        coal = await InventoryItem.filter(player=profile, item_id="coal").first()
+        coal_data = self.bot.items["coal"]
+
+        if coal is None:
+            return await interaction.edit_original_response(
+                content=f"{cosmetics.EMOJI_WARNING} You need **{coal_data.emoji} {coal_data.display_name}** to smelt items.",
+                embed=None,
+            )
+
+        required_fuel = math.ceil(quantity / 4)
+        if coal.quantity < required_fuel:
+            message = f"{cosmetics.EMOJI_WARNING} You need `{required_fuel}` **{coal_data.emoji} {coal_data.display_name}** " \
+                      f"to smelt `{quantity}` **{data.emoji} {data.display_name}**. You only have `{coal.quantity}` of coal."
+
+            return await interaction.edit_original_response(
+                content=message,
+                embed=None,
+            )
+
+        await coal.remove(required_fuel)
+        await inv_item.remove(quantity)
+        await InventoryItem.add(player=profile, item_id=item_formed.id, quantity=quantity)
+
+        xp_gained = random.randint(1, 5)
+        embed = discord.Embed(
+            title=":wood: Smelting",
+            description=f"Successfully smelted `{quantity}` **{data.emoji} {data.display_name}**",
+            color=discord.Color.dark_embed(),
+        )
+        embed.add_field(name="Product", value=f"{quantity}x **{item_formed.emoji} {item_formed.display_name}**")
+        embed.add_field(name="Fuel Used", value=f"{required_fuel}x **{coal_data.emoji} {coal_data.display_name}**")
+        embed.set_footer(text=f"+{xp_gained} XP")
+
+        await interaction.edit_original_response(embed=embed)
+        await profile.add_xp(xp_gained, interaction)
+
+    @smelt.autocomplete("item")
+    async def autocomplete_item_name_smeltable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=f"{item.display_name}", value=item_id)
+            for item_id, item in self.bot.items.items()
+            if current.lower() in item.display_name.lower() and item.smelting_product
+        ]
 
     @craft.autocomplete("item")
     async def autocomplete_item_name_craftable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
