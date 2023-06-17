@@ -19,5 +19,9 @@
     "saddle": {
         "probability": 0.1,
         "quantity": [1, 1]
+    },
+    "raw_rabbit": {
+        "probability": 0.4,
+        "quantity": [1, 3]
     }
 }

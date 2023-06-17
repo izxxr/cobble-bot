@@ -126,6 +126,24 @@
         "smelting_recipe": "raw_chicken",
         "food_hp_restored": 4
     },
+    "raw_rabbit": {
+        "display_name": "Raw Rabbit",
+        "rarity": "uncommon",
+        "type": "food",
+        "description": "Raw rabbit meat",
+        "emoji": "<:minecraft_raw_rabbit:1119523057757847633>",
+        "food_hp_restored": 1,
+        "smelting_product": "cooked_rabbit"
+    },
+    "cooked_rabbit": {
+        "display_name": "Cooked Rabbit",
+        "rarity": "uncommon",
+        "type": "food",
+        "description": "Briefly cooked rabbit.",
+        "emoji": "<:minecraft_cooked_rabbit:1119523158618280028>",
+        "smelting_recipe": "raw_rabbit",
+        "food_hp_restored": 3
+    },
     "fishing_rod": {
         "display_name": "Fishing Rod",
         "rarity": "common",
