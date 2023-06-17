@@ -164,7 +164,7 @@ class Player(Model):
             )
 
             embed.set_footer(text="The level and XP statistics reset upon dying.")
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, content=interaction.user.mention)
 
         if died:
             self.level = 1
