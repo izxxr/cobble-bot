@@ -77,7 +77,18 @@
         "rarity": "common",
         "type": "food",
         "description": "Dead and uncooked salmon",
-        "emoji": "<:minecraft_raw_salmon:1118051823987740704>"
+        "emoji": "<:minecraft_raw_salmon:1118051823987740704>",
+        "food_hp_restored": 1,
+        "smelting_product": "cooked_salmon"
+    },
+    "cooked_salmon": {
+        "display_name": "Cooked Salmon",
+        "rarity": "common",
+        "type": "food",
+        "description": "Briefly cooked salmon.",
+        "emoji": "<:minecraft_cooked_salmon:1119514182438621256>",
+        "smelting_recipe": "raw_salmon",
+        "food_hp_restored": 3
     },
     "fishing_rod": {
         "display_name": "Fishing Rod",

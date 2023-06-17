@@ -109,7 +109,7 @@ class Player(Model):
 
         return level_up
 
-    async def add_hp(self, hp: int) -> None:
+    async def add_hp(self, hp: float) -> None:
         """Adds HP to player"""
         self.health += hp
 

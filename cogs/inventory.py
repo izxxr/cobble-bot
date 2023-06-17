@@ -22,11 +22,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Union
 from discord import app_commands
 from discord.ext import commands, menus
 from core.models import InventoryItem, Player
-from core import checks, views, cosmetics
+from core import checks, views, cosmetics, datamodels
 
 import math
 import random
@@ -74,6 +74,25 @@ class Inventory(commands.GroupCog):
     """View and manage items in your inventory."""
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
+
+    def _is_usable(self, item: datamodels.Item) -> bool:
+        return any((
+            item.food_hp_restored is not None,
+        ))
+
+    async def _use_item(self, inventory_item: InventoryItem, quantity: int, player: Player) -> Union[bool, discord.Embed, str]:
+        data = self.bot.items[inventory_item.item_id]
+
+        if data.food_hp_restored is not None:
+            # food item
+            hp_gained = data.food_hp_restored * quantity
+            if hp_gained > 8:
+                hp_gained = 8
+
+            await player.add_hp(hp_gained)
+            return f"{cosmetics.EMOJI_HEALTH_HALF} Ate {quantity} **{data.emoji} {data.display_name}** to restore `{hp_gained}` HP."
+        else:
+            return False
 
     @app_commands.command()
     @checks.has_survival_profile()
@@ -333,6 +352,47 @@ class Inventory(commands.GroupCog):
 
         await interaction.edit_original_response(embed=embed)
         await profile.add_xp(xp_gained, interaction)
+
+    @app_commands.command()
+    @checks.has_survival_profile()
+    async def use(self, interaction: discord.Interaction, item: str, quantity: int = 1):
+        """Uses an item (e.g. eat food).
+
+        Parameters
+        ----------
+        item:
+            The name of item to use.
+        quantity:
+            The quantity to use. Defaults to 1.
+        """
+        item = item.lower().replace(" ", "_")
+        if item not in self.bot.items:
+            raise checks.GenericError("Unknown item name provided.")
+
+        await interaction.response.defer()
+
+        profile = interaction.extras["survival_profile"]
+        inv_item = await InventoryItem.filter(item_id=item, player=profile).first()
+
+        if inv_item is None:
+            raise checks.GenericError("You don't have this item.")
+
+        result = await self._use_item(inv_item, quantity, profile)
+
+        if isinstance(result, str):
+            await interaction.followup.send(content=result)
+        elif isinstance(result, discord.Embed):
+            await interaction.followup.send(embed=result)
+        else:
+            raise checks.GenericError("This item cannot be used.")
+
+    @use.autocomplete("item")
+    async def autocomplete_item_name_usable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=f"{item.display_name}", value=item_id)
+            for item_id, item in self.bot.items.items()
+            if current.lower() in item.display_name.lower() and self._is_usable(item)
+        ]
 
     @smelt.autocomplete("item")
     async def autocomplete_item_name_smeltable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
