@@ -15,3 +15,4 @@ The pages are documented below:
     - [Inventory and Crafting](bot-features/inventory-and-crafting.md)
     - [Biomes and Exploration](bot-features/biomes-and-exploration.md)
     - [Fishing](bot-features/fishing.md)
+    - [Mining](bot-features/mining.md)
