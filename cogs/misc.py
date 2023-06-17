@@ -23,7 +23,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from discord import app_commands
 from discord.ext import commands
+
+import discord
 
 if TYPE_CHECKING:
     from core.bot import CobbleBot
@@ -34,10 +37,23 @@ class Misc(commands.Cog):
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
 
-    @commands.command()
-    async def ping(self, ctx: commands.Context[CobbleBot]) -> None:
+    @app_commands.command()
+    async def ping(self, interaction: discord.Interaction) -> None:
         """Shows the current websocket latency of the bot."""
-        await ctx.send(f":ping_pong: Pong! In {round(self.bot.latency * 1000)}ms")
+        await interaction.response.send_message(f":ping_pong: Pong! In {round(self.bot.latency * 1000)}ms")
+
+    @app_commands.command()
+    async def info(self, interaction: discord.Interaction) -> None:
+        """Shows information about Cobble bot."""
+        embed = discord.Embed(
+            title="Cobble Bot",
+            description="Minecraft inspired bot bringing realistic survival experience to Discord servers.",
+            color=discord.Color.dark_embed(),
+        )
+        embed.set_thumbnail(url=self.bot.user.display_avatar.url)  # type: ignore
+        embed.add_field(name="Source", value="Cobble is an open source project. Check the [code repository](https://github.com/izxxr/cobble-bot)")
+        embed.set_footer(text="Created with ♥ by @izxxr")
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot: CobbleBot):
     await bot.add_cog(Misc(bot))
