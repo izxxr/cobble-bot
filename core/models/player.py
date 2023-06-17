@@ -62,6 +62,10 @@ class Player(Model):
     flags = fields.BigIntField(default=0)
     """Internal player flags."""
 
+    @property
+    def total_xp(self) -> int:
+        return (self.level * 100) + self.xp
+
     def get_required_xp(self) -> int:
         """Returns the required XP to level up."""
         return self.level * 100
@@ -159,7 +163,7 @@ class Player(Model):
 
             embed.add_field(
                 name="Statistics",
-                value=f"**Level {self.level}**\n{utils.progress_bar(self.xp, self.get_required_xp())} " \
+                value=f"**Level {self.level} ({self.total_xp} points)**\n{utils.progress_bar(self.xp, self.get_required_xp())} " \
                       f"({self.xp}/{self.get_required_xp()})"
             )
 
