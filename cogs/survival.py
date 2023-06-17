@@ -126,7 +126,7 @@ class Survival(commands.Cog):
         )
 
         embed.add_field(name="Collected Loot", value="\n".join(
-                                                    f"{x[1]}x {x[0].emoji} {x[0].display_name}"
+                                                    f"{x[1]}x {x[0].name(bold=False)}"
                                                     for x in loot))
 
         if xp_gained:
@@ -138,7 +138,7 @@ class Survival(commands.Cog):
         item = self.bot.items[item_id]
         embed = discord.Embed(
             title=":adhesive_bandage: Item Broken",
-            description=f"Your **{item.emoji} {item.display_name}** just broke.",
+            description=f"Your {item.name()} just broke.",
             color=discord.Color.red(),
         )
 
@@ -196,7 +196,7 @@ class Survival(commands.Cog):
         embed = self._generate_loot_embed(
             loot,
             title=":hiking_boot: Exploration",
-            description=f"You explored the **{view.selected_biome.emoji} {view.selected_biome.display_name}**",
+            description=f"You explored the {view.selected_biome.name()}",
             xp_gained=xp_gained,
         )
 
@@ -226,7 +226,7 @@ class Survival(commands.Cog):
             color=discord.Color.dark_embed(),
         )
 
-        embed.add_field(name="Biome", value=f"{discovered_biome.emoji} {discovered_biome.display_name}")
+        embed.add_field(name="Biome", value=discovered_biome.name(bold=False))
         embed.add_field(name="Information", value=discovered_biome.description)
         embed.add_field(name="Rarity", value=discovered_biome.rarity.title())
         embed.set_image(url=discovered_biome.background)
@@ -248,7 +248,7 @@ class Survival(commands.Cog):
         if invitem is None:
             fishing_rod = self.bot.items["fishing_rod"]
             return await interaction.edit_original_response(
-                content=f"{cosmetics.EMOJI_WARNING} You need a **{fishing_rod.emoji} {fishing_rod.display_name}** to fish.",
+                content=f"{cosmetics.EMOJI_WARNING} You need a {fishing_rod.name()} to fish.",
                 embed=None,
             )
 

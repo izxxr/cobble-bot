@@ -52,3 +52,7 @@ class Biome:
         if val == 0:
             return True
         return (player.achievements & val) == val
+
+    def name(self, bold: bool = True) -> str:
+        n = f"{self.emoji} {self.display_name}"
+        return f"**{n}**" if bold else n

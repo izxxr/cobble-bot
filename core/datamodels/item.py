@@ -46,3 +46,8 @@ class Item:
     durability: Optional[int] = None
     crafting_quantity: int = 1
     food_hp_restored: Optional[float] = None
+
+
+    def name(self, bold: bool = True) -> str:
+        n = f"{self.emoji} {self.display_name}"
+        return f"**{n}**" if bold else n

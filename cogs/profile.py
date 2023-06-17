@@ -53,8 +53,37 @@ class Profile(commands.GroupCog):
                         "Use various commands to collect valuable resources and use them " \
                         "to improve your profile. As you get further, you will level up to " \
                         "higher levels which also gives more amazing perks. Use `/profile view` " \
-                        "to view your profile and progress.\n\nGood Luck!",
+                        "to view your profile and progress. A few tips have been added for you below.\n\nGood Luck!",
             color=discord.Color.green(),
+        )
+        
+        embed.add_field(
+            name="Profile",
+            value="Manage your profile from `/profile` command group. View your statistics, " \
+                  "most importantly your health from `/profile view` command. **Don't forget to eat " \
+                  "to heal yourself otherwise dying resets your levels!**",
+            inline=False,
+        )
+        embed.add_field(
+            name="Inventory",
+            value="Manage your inventory from `/inventory` command group. Craft and smelt items to " \
+                  "produce useful tools and items. Use `/inventory info` to get information about items " \
+                  "and `/inventory craft/smelt` to craft or smelt items. To use an item (e.g. eating food), use " \
+                  "`/inventory use`.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Collecting Resources",
+            value="`/explore` command is your first step towards collecting resources. You can " \
+                  "explore different biomes using this command with each biome having specific loot. " \
+                  "As you explore more, you'll discover more rarer biomes which will have even better loot. " \
+                  "Other commands for collecting resources are `/mine` and `/fish`.",
+            inline=False,
+        )
+        embed.add_field(
+            name="Learn More",
+            value="To get info on how something works, use the [docs](https://github.com/izxxr/cobble-bot/tree/main/docs).",
+            inline=False
         )
 
         await interaction.response.send_message(embed=embed)

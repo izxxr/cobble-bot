@@ -65,7 +65,7 @@ class InventoryViewSource(menus.ListPageSource):
             if item.durability is not None:
                 stats += f"Durability: {inv_item.durability}/{item.durability}"
 
-            embed.add_field(name=f"{item.emoji} {item.display_name}", value=stats, inline=True)
+            embed.add_field(name=f"{item.name(bold=False)}", value=stats, inline=True)
 
         return embed
 
@@ -90,7 +90,7 @@ class Inventory(commands.GroupCog):
                 hp_gained = 8
 
             await player.add_hp(hp_gained)
-            return f"{cosmetics.EMOJI_HEALTH_HALF} Ate {quantity} **{data.emoji} {data.display_name}** to restore `{hp_gained}` HP."
+            return f"{cosmetics.EMOJI_HEALTH_HALF} Ate {quantity} {data.name()} to restore `{hp_gained}` HP."
         else:
             return False
 
@@ -124,7 +124,7 @@ class Inventory(commands.GroupCog):
 
         data = self.bot.items[item]
         embed = discord.Embed(
-            title=f"{data.emoji} {data.display_name}",
+            title=data.name(bold=False),
             description=data.description,
             color=discord.Color.dark_embed(),
         )
@@ -144,7 +144,7 @@ class Inventory(commands.GroupCog):
             embed.add_field(
                 name="Crafting Recipe",
                 value=f"\n".join(
-                    f"{amount}x {self.bot.items[reqitem].emoji} {self.bot.items[reqitem].display_name}"
+                    f"{amount}x {self.bot.items[reqitem].name(bold=False)}"
                     for reqitem, amount in data.crafting_recipe.items()
                 ),
                 inline=False,
@@ -158,7 +158,7 @@ class Inventory(commands.GroupCog):
             reqitem = self.bot.items[data.smelting_recipe]
             embed.add_field(
                 name="Smelting Recipe",
-                value=f"{reqitem.emoji} {reqitem.display_name}",
+                value=reqitem.name(bold=False),
                 inline=False,
             )
 
@@ -166,7 +166,7 @@ class Inventory(commands.GroupCog):
             reqitem = self.bot.items[data.smelting_product]
             embed.add_field(
                 name="Smelting Product",
-                value=f"{reqitem.emoji} {reqitem.display_name}",
+                value=reqitem.name(bold=False),
                 inline=False,
             )
 
@@ -210,12 +210,12 @@ class Inventory(commands.GroupCog):
             amount = int(quantity)
 
         if amount > data.quantity:
-            raise checks.GenericError(f"You don't have this much quantity. You only have `{data.quantity}` **{item_data.emoji} {item_data.display_name}**.")
+            raise checks.GenericError(f"You don't have this much quantity. You only have `{data.quantity}` {item_data.name()}.")
 
         confirmation = views.Confirmation(user=interaction.user, timeout=30)
         embed = discord.Embed(
             title=f"{cosmetics.EMOJI_DANGER} Are you sure?",
-            description=f"You are about to discard `{amount}` **{item_data.emoji} {item_data.display_name}**. After discarding, the item will be lost.",
+            description=f"You are about to discard `{amount}` {item_data.name()}. After discarding, the item will be lost.",
             color=discord.Color.dark_embed(),
         )
 
@@ -226,7 +226,7 @@ class Inventory(commands.GroupCog):
 
         if confirmation.confirmed:
             await data.remove(amount)
-            message = f"Discarded `{amount}` **{item_data.emoji} {item_data.display_name}**"
+            message = f"Discarded `{amount}` {item_data.name()}"
         else:
             message = f"Action canceled. No changes were made."
 
@@ -267,13 +267,11 @@ class Inventory(commands.GroupCog):
 
             error_message = ""
             if required_item is None:
-                error_message = f"{cosmetics.EMOJI_WARNING} You need `{crafting_quantity}` **{required_item_data.emoji} " \
-                                f"{required_item_data.display_name}**. You have none."
+                error_message = f"{cosmetics.EMOJI_WARNING} You need `{crafting_quantity}` {required_item_data.name()}. You have none."
             else:
                 required_quantity = crafting_quantity * quantity
                 if required_quantity > required_item.quantity:
-                    error_message = f"{cosmetics.EMOJI_WARNING} You need `{required_quantity}` {required_item_data.emoji} " \
-                                    f"{required_item_data.display_name}. You currently have `{required_item.quantity}` of it."
+                    error_message = f"{cosmetics.EMOJI_WARNING} You need `{required_quantity}` {required_item_data.name()}. You currently have `{required_item.quantity}` of it."
                 else:
                     await required_item.remove(required_quantity)
 
@@ -284,7 +282,7 @@ class Inventory(commands.GroupCog):
         # craft the given item so add it to inventory.
         quantity_crafted = quantity * item_data.crafting_quantity
         await InventoryItem.add(player=profile, item_id=item, quantity=quantity_crafted, durability=item_data.durability)
-        await interaction.edit_original_response(content=f":carpentry_saw: Crafted `{quantity_crafted}` **{item_data.emoji} {item_data.display_name}**", embed=None)
+        await interaction.edit_original_response(content=f":carpentry_saw: Crafted `{quantity_crafted}` {item_data.name()}", embed=None)
 
     @app_commands.command()
     @checks.has_survival_profile()
@@ -320,7 +318,7 @@ class Inventory(commands.GroupCog):
             )
         if inv_item.quantity < quantity:
             return await interaction.edit_original_response(
-                content=f"{cosmetics.EMOJI_WARNING} You only have `{inv_item.quantity}` **{data.emoji} {data.display_name}**.",
+                content=f"{cosmetics.EMOJI_WARNING} You only have `{inv_item.quantity}` {data.name()}.",
                 embed=None,
             )
 
@@ -330,14 +328,14 @@ class Inventory(commands.GroupCog):
 
         if coal is None:
             return await interaction.edit_original_response(
-                content=f"{cosmetics.EMOJI_WARNING} You need **{coal_data.emoji} {coal_data.display_name}** to smelt items.",
+                content=f"{cosmetics.EMOJI_WARNING} You need {data.name()} to smelt items.",
                 embed=None,
             )
 
         required_fuel = math.ceil(quantity / 4)
         if coal.quantity < required_fuel:
-            message = f"{cosmetics.EMOJI_WARNING} You need `{required_fuel}` **{coal_data.emoji} {coal_data.display_name}** " \
-                      f"to smelt `{quantity}` **{data.emoji} {data.display_name}**. You only have `{coal.quantity}` of coal."
+            message = f"{cosmetics.EMOJI_WARNING} You need `{required_fuel}` {coal_data.name()} " \
+                      f"to smelt `{quantity}` {data.name()}. You only have `{coal.quantity}` of coal."
 
             return await interaction.edit_original_response(
                 content=message,
@@ -351,11 +349,11 @@ class Inventory(commands.GroupCog):
         xp_gained = random.randint(1, 5)
         embed = discord.Embed(
             title=":wood: Smelting",
-            description=f"Successfully smelted `{quantity}` **{data.emoji} {data.display_name}**",
+            description=f"Successfully smelted `{quantity}` {data.name()}",
             color=discord.Color.dark_embed(),
         )
-        embed.add_field(name="Product", value=f"{quantity}x **{item_formed.emoji} {item_formed.display_name}**")
-        embed.add_field(name="Fuel Used", value=f"{required_fuel}x **{coal_data.emoji} {coal_data.display_name}**")
+        embed.add_field(name="Product", value=f"{quantity}x {item_formed.name()}")
+        embed.add_field(name="Fuel Used", value=f"{required_fuel}x {coal_data.name()}")
         embed.set_footer(text=f"+{xp_gained} XP")
 
         await interaction.edit_original_response(embed=embed)
