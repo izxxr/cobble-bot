@@ -148,7 +148,7 @@ class Survival(commands.Cog):
         return embed
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 600))
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 30))
     @checks.has_survival_profile()
     async def explore(self, interaction: discord.Interaction):
         """Explore different biomes and collect valuables and other resources."""
@@ -234,7 +234,7 @@ class Survival(commands.Cog):
         await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
 
     @app_commands.command()
-    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 300))
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 60))
     @checks.has_survival_profile()
     async def fish(self, interaction: discord.Interaction):
         """Obtain resources from fishing."""
@@ -271,7 +271,7 @@ class Survival(commands.Cog):
 
     @app_commands.command()
     @checks.has_survival_profile()
-    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 1800))
+    @app_commands.checks.dynamic_cooldown(checks.cooldown_factory(1, 120))
     async def mine(self, interaction: discord.Interaction):
         """Go for mining to collect minerals and other resources."""
         await interaction.response.defer()
