@@ -1,4 +1,5 @@
 discord.py
 python-dotenv
 tortoise-orm
+jishaku
 git+https://github.com/Rapptz/discord-ext-menus

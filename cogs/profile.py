@@ -122,23 +122,23 @@ class Profile(commands.GroupCog):
     async def view(self, interaction: discord.Interaction) -> None:
         """View your survival profile."""
         await interaction.response.defer()
-        profile = interaction.extras["survival_profile"]
+        profile: Player = interaction.extras["survival_profile"]
         required_xp = profile.get_required_xp()
 
         embed = discord.Embed(title=f":pick: Survival Profile", color=discord.Color.light_embed())
         embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
 
-        if profile.level == 0:
+        if profile.xp == 0:
             embed.add_field(name="No level yet", value="Use various commands to level up!")
         else:
             embed.add_field(
                 name=f"Level {profile.level}",
-                value=f"{utils.progress_bar(profile.xp, required_xp)} ({profile.xp}/{required_xp})",
+                value=f"{utils.progress_bar(profile.level_xp, required_xp)} ({profile.level_xp}/{required_xp})",
             )
 
         full_hearts = int(profile.health // 1)
         half_heart = True if (profile.health % 1) == 0.5 else False
-        empty_hearts = int(8 - profile.health)
+        empty_hearts = int( - profile.health)
 
         embed.add_field(
             name="Health",

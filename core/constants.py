@@ -20,41 +20,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import annotations
-
-from discord.flags import BaseFlags, flag_value, fill_with_flags
-
-__all__ = (
-    'Achievements',
-    'PlayerFlags',
-)
-
-
-@fill_with_flags()
-class Achievements(BaseFlags):
-    """Represents the achievements a user has."""
-
-    @flag_value
-    def discovered_biome_desert(self) -> int:
-        """Discover the desert biome."""
-        return 1 << 0
-
-    @flag_value
-    def discovered_biome_ocean(self) -> int:
-        """Discover the ocean biome."""
-        return 1 << 1
-
-
-@fill_with_flags()
-class PlayerFlags(BaseFlags):
-    """Represents the flags a user has."""
-
-    @flag_value
-    def died_once(self) -> int:
-        """The player has died at least once."""
-        return 1 << 0
-
-    @flag_value
-    def hide_on_leaderboard(self) -> int:
-        """Whether the player is hidden on leaderboard."""
-        return 1 << 1
+XP_FACTOR = 100
+MAX_HEALTH = 8

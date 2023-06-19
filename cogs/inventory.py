@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, List, Union
 from discord import app_commands
 from discord.ext import commands, menus
 from core.models import InventoryItem, Player
+from core.constants import MAX_HEALTH
 from core import checks, views, cosmetics, datamodels
 
 import math
@@ -86,8 +87,8 @@ class Inventory(commands.GroupCog):
         if data.food_hp_restored is not None:
             # food item
             hp_gained = data.food_hp_restored * quantity
-            if hp_gained > 8:
-                hp_gained = 8
+            if hp_gained > MAX_HEALTH:
+                hp_gained = MAX_HEALTH
 
             await player.add_hp(hp_gained)
             return f"{cosmetics.EMOJI_HEALTH_HALF} Ate {quantity} {data.name()} to restore `{hp_gained}` HP."

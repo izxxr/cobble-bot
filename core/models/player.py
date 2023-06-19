@@ -27,7 +27,7 @@ from core.datamodels import Achievements, PlayerFlags
 from tortoise.models import Model
 from tortoise import fields
 from discord import Embed, Color
-from core import cosmetics, utils
+from core import cosmetics, utils, constants
 
 if TYPE_CHECKING:
     from discord import Interaction
@@ -44,13 +44,10 @@ class Player(Model):
     id = fields.IntField(pk=True)
     """The Discord user ID."""
 
-    level = fields.IntField(default=0)
-    """Player's current level."""
-
     xp = fields.IntField(default=0)
     """The experience points that the player has."""
 
-    health = fields.FloatField(default=8)
+    health = fields.FloatField(default=constants.MAX_HEALTH)
     """The player's current health."""
 
     created_at = fields.DatetimeField(auto_now_add=True)
@@ -63,12 +60,19 @@ class Player(Model):
     """Internal player flags."""
 
     @property
-    def total_xp(self) -> int:
-        return (self.level * 100) + self.xp
+    def level(self) -> int:
+        return self.xp // constants.XP_FACTOR
+
+    @property
+    def level_xp(self) -> int:
+        return self.xp % constants.XP_FACTOR
 
     def get_required_xp(self) -> int:
         """Returns the required XP to level up."""
-        return self.level * 100
+        if self.level == 0:
+            return constants.XP_FACTOR
+
+        return self.level * constants.XP_FACTOR
 
     def get_achievements(self) -> Achievements:
         """Returns the achievements a user has."""
@@ -88,20 +92,13 @@ class Player(Model):
         Returns True if the user leveled up after addition of XP.
         """
         level_up = False
+        old_level = self.level
 
-        while not xp <= 0:
-            required = self.get_required_xp()
-
-            if (self.xp + xp) >= required:
-                self.level += 1
-                self.xp = 0
-                xp -= required
-                level_up = True
-            else:
-                self.xp += xp
-                break
-
+        self.xp += xp
         await self.save()
+
+        if old_level < self.level:
+            level_up = True
 
         if interaction is not None and level_up:
             embed = Embed(
@@ -118,8 +115,8 @@ class Player(Model):
         self.health += hp
 
         # Ensure we don't exceed max health
-        if self.health > 8:
-            self.health = 8
+        if self.health > constants.MAX_HEALTH:
+            self.health = constants.MAX_HEALTH
 
         await self.save()
 
@@ -133,7 +130,7 @@ class Player(Model):
         """Removes HP from the player. Returns True if the health dropped to zero (player died)."""
         died = False
         if (self.health - hp) <= 0:
-            self.health = 8
+            self.health = constants.MAX_HEALTH
             died = True
         else:
             self.health -= hp
@@ -163,15 +160,14 @@ class Player(Model):
 
             embed.add_field(
                 name="Statistics",
-                value=f"**Level {self.level} ({self.total_xp} points)**\n{utils.progress_bar(self.xp, self.get_required_xp())} " \
-                      f"({self.xp}/{self.get_required_xp()})"
+                value=f"**Level {self.level} ({self.xp} points)**\n{utils.progress_bar(self.level_xp, self.get_required_xp())} " \
+                      f"({self.level_xp}/{self.get_required_xp()})"
             )
 
             embed.set_footer(text="The level and XP statistics reset upon dying.")
             await interaction.followup.send(embed=embed, content=interaction.user.mention)
 
         if died:
-            self.level = 1
             self.xp = 0
 
 

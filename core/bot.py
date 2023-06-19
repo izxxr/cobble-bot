@@ -101,7 +101,12 @@ class CobbleBot(commands.Bot):
     def __init__(self) -> None:
         super().__init__(
             command_prefix=commands.when_mentioned_or('?'),
-            intents=discord.Intents(guilds=True, messages=True, message_content=True),
+            intents=discord.Intents(
+                guilds=True,
+                messages=True,
+                message_content=True,
+                members=True,
+            ),
             description="A minecraft-inspired bot bringing fun survival experience to Discord servers.",
             allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=False, roles=False),
             max_messages=None,
@@ -163,6 +168,7 @@ class CobbleBot(commands.Bot):
             else:
                 loaded += 1
 
+        await self.load_extension('jishaku')
         logging.info(f'Loaded {loaded} extensions. {total - loaded} extensions could not be loaded.')
 
 

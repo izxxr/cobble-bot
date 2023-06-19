@@ -37,6 +37,8 @@ __all__ = (
     'AuthorizedView',
     'Confirmation',
     'Paginator',
+    'LazyPaginationSource',
+    'LazyPaginator',
 )
 
 
@@ -81,7 +83,7 @@ class Paginator(AuthorizedView, menus.MenuPages):
             timeout: Optional[float] = 180,
             bot: CobbleBot,
             user: discord.abc.Snowflake,
-            source: menus.ListPageSource,
+            source: menus.PageSource,
         ):
 
         super().__init__(timeout=timeout, user=user)
@@ -99,8 +101,6 @@ class Paginator(AuthorizedView, menus.MenuPages):
         await self.send_initial_response(interaction)
 
     async def show_page(self, page_number: int):
-        assert self.interaction is not None
-
         page = await self._source.get_page(page_number)  # type: ignore
         self.current_page = page_number
         self._update_buttons_state()
@@ -122,8 +122,12 @@ class Paginator(AuthorizedView, menus.MenuPages):
         return value
 
     def _update_buttons_state(self) -> None:
-        last_page_idx = self._source.get_max_pages() - 1
+        max_pages = self._source.get_max_pages()
+        if max_pages is None:
+            self.last_page.disabled = True
+            return
 
+        last_page_idx = max_pages - 1
         if self.current_page == 0:
             self.next_page.disabled = False
             self.last_page.disabled = False
@@ -165,5 +169,38 @@ class Paginator(AuthorizedView, menus.MenuPages):
 
     @ui.button(emoji='\U000023e9', style=discord.ButtonStyle.blurple)
     async def last_page(self, interaction: discord.Interaction, button: ui.Button[Self]):
+        max_pages = self._source.get_max_pages()
+        if max_pages is None:
+            # probably unexhausted lazy pagination source
+            return
+
         await interaction.response.defer()
-        await self.show_page(self._source.get_max_pages() - 1)
+        await self.show_page(max_pages - 1)  # type: ignore  # should never be None
+
+
+class LazyPaginationSource(menus.PageSource):
+    """Abstract class for source of lazy pagination."""
+    def __init__(self) -> None:
+        self.last_page: Optional[int] = None
+
+        super().__init__()
+
+
+class LazyPaginator(Paginator):
+    """Similar to views.Paginator but allows pagination for lazily fetched data.
+
+    The source passed must be compatible with the LazyPaginationSource protocol.
+    """
+    _source: LazyPaginationSource
+
+    async def show_page(self, page_number: int):
+        page = await self._source.get_page(page_number)  # type: ignore
+
+        if self._source.last_page is not None and page_number > self._source.last_page:
+            self.current_page = self._source.last_page
+        else:
+            self.current_page = page_number
+
+        self._update_buttons_state()
+        kwargs = await self._get_kwargs_from_page(page)  # type: ignore
+        await self.interaction.edit_original_response(**kwargs)
