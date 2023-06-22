@@ -10,7 +10,7 @@ The pages are documented below:
 
 - [General Features](bot-features/)
     - [Player Profile](bot-features/player-profiles.md)
-    - [Leveling](bot-features/leveling.md)
+    - [Leveling and Leaderboards](bot-features/leveling-and-leaderboards.md)
     - [Health](bot-features/health.md)
     - [Inventory and Crafting](bot-features/inventory-and-crafting.md)
     - [Biomes and Exploration](bot-features/biomes-and-exploration.md)

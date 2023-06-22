@@ -1,4 +1,4 @@
-# Leveling
+# Leveling and Leaderboards
 Cobble has a basic leveling system. When a profile is created, the level is 0 and as user gains
 XP, the level is advanced. Levels are used to represent the progress of a player.
 
@@ -19,3 +19,12 @@ required_xp = level_number * 100
 ## Level Advancement
 Everytime a player reaches a certain amount of XP, the level is advanced. As soon as level
 is advanced, a message is sent to notify the player about the advancement.
+
+## Leaderboards
+Leaderboards shows the ranking of players globally or in a guild in terms of experience points. In
+order to view the global leaderboard, `/leaderboard global` command is used. Similarly,
+`/leaderboard guild` command is for guild leaderboard.
+
+> Note for contributors and developers: Leaderboard command is optimized to work with
+> the members intent enabled. If that intent is disabled, the command would need to manually
+> fetch individual user causing the navigation to be slow.
