@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from discord import app_commands
 from discord.ext import commands
 from core.models import Player
+from core.constants import MAX_HEALTH
 from core import cosmetics, checks, views, utils
 
 import discord
@@ -138,7 +139,7 @@ class Profile(commands.GroupCog):
 
         full_hearts = int(profile.health // 1)
         half_heart = True if (profile.health % 1) == 0.5 else False
-        empty_hearts = int( - profile.health)
+        empty_hearts = int(MAX_HEALTH - profile.health)
 
         embed.add_field(
             name="Health",
