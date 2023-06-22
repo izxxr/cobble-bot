@@ -22,13 +22,14 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from discord import app_commands
 from tortoise import Tortoise
 from core import utils, cosmetics, datamodels
 from discord.ext import commands
 from discord.utils import MISSING
 from core.checks import GenericError
+from core.models import GuildPlayer
 
 import os
 import json
@@ -135,6 +136,17 @@ class CobbleBot(commands.Bot):
 
     async def on_ready(self) -> None:
         _log.info(f'Logged in and connected as {self.user} ({self.user.id})')  # type: ignore
+
+    async def on_app_command_completion(self, interaction: discord.Interaction, command: app_commands.Command[Any, Any, Any]) -> None:
+        if interaction.guild is None or not command.extras.get("guild_user", False):
+            return
+
+        player = interaction.extras.get("survival_profile")
+        if player is None:
+            return
+
+        if not await GuildPlayer.exists(player=player, guild_id=interaction.guild_id):
+            await GuildPlayer.create(player=player, guild_id=interaction.guild_id)
 
     async def init_extensions(self, unload_all: bool = False, ignore_errors: bool = True) -> None:
         """Initializes the extensions from the cogs directory.

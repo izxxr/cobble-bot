@@ -39,6 +39,11 @@ class Profile(commands.GroupCog):
     """Manage your survival player profile."""
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
+        self._inject_command_extras()
+
+    def _inject_command_extras(self) -> None:
+        for command in self.walk_app_commands():
+            command.extras["guild_user"] = True
 
     @app_commands.command()
     async def start(self, interaction: discord.Interaction):

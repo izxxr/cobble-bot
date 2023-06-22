@@ -92,6 +92,11 @@ class Survival(commands.Cog):
     """Commands for collecting resources and valuables."""
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
+        self._inject_command_extras()
+
+    def _inject_command_extras(self) -> None:
+        for command in self.walk_app_commands():
+            command.extras["guild_user"] = True
 
     async def _process_loot_table(self, profile: Player, table: datamodels.LootTable) -> ObtainedLootT:
         obtained_loot: ObtainedLootT = []

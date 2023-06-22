@@ -25,10 +25,13 @@ from __future__ import annotations
 from typing import Optional, Any, Dict, TYPE_CHECKING
 from typing_extensions import Self
 from discord.ext import menus
+from discord.utils import MISSING
 from discord import ui, ButtonStyle
 from core import cosmetics
 
 import discord
+
+from core.bot import CobbleBot
 
 if TYPE_CHECKING:
     from core.bot import CobbleBot
@@ -101,6 +104,9 @@ class Paginator(AuthorizedView, menus.MenuPages):
         await self.send_initial_response(interaction)
 
     async def show_page(self, page_number: int):
+        if page_number < 0:
+            return
+
         page = await self._source.get_page(page_number)  # type: ignore
         self.current_page = page_number
         self._update_buttons_state()
@@ -113,7 +119,10 @@ class Paginator(AuthorizedView, menus.MenuPages):
         kwargs = await self._get_kwargs_from_page(page)  # type: ignore
 
         self._update_buttons_state()
-        await interaction.response.send_message(**kwargs)
+        if interaction.response.is_done():
+            await interaction.followup.send(**kwargs)
+        else:
+            await interaction.response.send_message(**kwargs)
 
     async def _get_kwargs_from_page(self, page: menus.PageSource) -> Any:
         value: Dict[str, Any] = await super()._get_kwargs_from_page(page)  # type: ignore
@@ -181,9 +190,26 @@ class Paginator(AuthorizedView, menus.MenuPages):
 class LazyPaginationSource(menus.PageSource):
     """Abstract class for source of lazy pagination."""
     def __init__(self) -> None:
-        self.last_page: Optional[int] = None
+        self._last_page: Optional[int] = None
+        self.menu: LazyPaginator = MISSING
 
         super().__init__()
+
+    @property
+    def last_page(self) -> Optional[int]:
+        return self._last_page
+
+    def set_last_page(self, page_number: int, initial: bool = True) -> None:
+        self._last_page = page_number
+
+        if self.menu is not MISSING and initial:
+            self.menu.current_page = page_number
+
+    def exhausted(self) -> bool:
+        return self._last_page is not None
+
+    def is_paginating(self) -> bool:
+        return True
 
 
 class LazyPaginator(Paginator):
@@ -193,13 +219,19 @@ class LazyPaginator(Paginator):
     """
     _source: LazyPaginationSource
 
+    async def start_pagination(self, interaction: discord.Interaction) -> None:
+        self._source.menu = self
+        await super().start_pagination(interaction)
+
     async def show_page(self, page_number: int):
-        page = await self._source.get_page(page_number)  # type: ignore
+        if page_number < 0:
+            return
 
         if self._source.last_page is not None and page_number > self._source.last_page:
-            self.current_page = self._source.last_page
-        else:
-            self.current_page = page_number
+            page_number = self._source.last_page
+
+        self.current_page = page_number
+        page = await self._source.get_page(page_number)  # type: ignore
 
         self._update_buttons_state()
         kwargs = await self._get_kwargs_from_page(page)  # type: ignore

@@ -75,6 +75,11 @@ class Inventory(commands.GroupCog):
     """View and manage items in your inventory."""
     def __init__(self, bot: CobbleBot) -> None:
         self.bot = bot
+        self._inject_command_extras()
+
+    def _inject_command_extras(self) -> None:
+        for command in self.walk_app_commands():
+            command.extras["guild_user"] = True
 
     def _is_usable(self, item: datamodels.Item) -> bool:
         return any((

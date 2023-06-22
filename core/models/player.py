@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Player",
+    "GuildPlayer",
 )
 
 
@@ -173,3 +174,10 @@ class Player(Model):
 
         await self.save()
         return died
+
+
+class GuildPlayer(Model):
+    """Represents a player related to a guild"""
+    player: fields.ForeignKeyRelation[Player] = fields.ForeignKeyField("models.Player", "guild_players")
+    guild_id = fields.IntField()
+    flags = fields.IntField(default=0)
