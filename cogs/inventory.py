@@ -22,7 +22,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List, Union, Any
+from typing_extensions import Self
 from discord import app_commands
 from discord.ext import commands, menus
 from core.models import InventoryItem, Player
@@ -70,6 +71,99 @@ class InventoryViewSource(menus.ListPageSource):
 
         return embed
 
+
+class InventoryDiscardSource(menus.ListPageSource):
+    entries: List[InventoryItem]
+
+    def __init__(self, entries: List[InventoryItem]):
+        super().__init__(entries, per_page=1)
+
+    async def format_page(self, menu: InventoryDiscardView, page: InventoryItem) -> Any:
+        # page should always have one element only.
+        data = menu.bot.items[page.item_id]
+        
+        embed = discord.Embed(
+            title=data.name(),
+            description=f"{data.description}",
+            color=discord.Color.dark_embed(),
+        )
+
+        embed.add_field(name="Durability", value=f"`{page.durability}`/`{data.durability}`")
+        embed.set_footer(text=f"Item {menu.current_page + 1}/{self.get_max_pages()}")
+
+        return {
+            "content": "Multiple items found of similar name, use the paginator below to discard the items.",
+            "embed": embed
+        }
+    
+    def remove_item(self, item: InventoryItem) -> bool:
+        self.entries.remove(item)
+        self._max_pages -= 1
+        return self.get_max_pages() == 0
+
+
+class InventoryDiscardView(views.Paginator):
+    _source: InventoryDiscardSource
+
+    def __init__(self, *, items: List[InventoryItem], bot: CobbleBot, user: discord.abc.Snowflake):
+        super().__init__(timeout=60.0, user=user, source=InventoryDiscardSource(items), bot=bot)
+
+        self.discard_in_progress = False
+        self.remove_item(self.last_page)
+        self.remove_item(self.first_page)
+
+    async def show_page(self, page_number: int):
+        if self.discard_in_progress:
+            await self.interaction.followup.send(
+                f"{cosmetics.EMOJI_ERROR} Please finish the currently in progress confirmation to go to next item.",
+                ephemeral=True,
+            )
+        else:
+            await super().show_page(page_number)
+
+    @discord.ui.button(row=1, label="Discard Item", emoji="\U0001f5d1", style=discord.ButtonStyle.red)
+    async def discard_current(self, interaction: discord.Interaction, button: discord.ui.Button[Self]) -> None:
+        self.discard_in_progress = True
+        await interaction.response.defer()
+        assert interaction.message is not None
+
+        # So many type ignores because of the hacky implementation of views.Paginator
+        item: InventoryItem = await self._source.get_page(self.current_page)  # type: ignore
+        data = self.bot.items[item.item_id]  # type: ignore
+
+        confirmation = views.Confirmation(user=self.user)
+        embed = discord.Embed(
+            title=f"{cosmetics.EMOJI_DANGER} Are you sure?",
+            description=f"You are about to discard `1` {data.name()}. After discarding, the item will be lost.",
+            color=discord.Color.dark_embed(),
+        )
+
+        message = await interaction.followup.send(view=confirmation, embed=embed, wait=True)
+
+        if await confirmation.wait():
+            # Timed out
+            await message.delete()
+        else:
+            if confirmation.confirmed:
+                # Non-stackable items are always 1 in quantity though 1 is passed explicitly
+                # here to avoid problems if stackable durable items are added in future.
+                await item.remove(quantity=1)  # type: ignore
+                msg = f"Discarded `1` {data.name()}."
+
+                if self._source.remove_item(item):  # type: ignore
+                    await interaction.message.delete()
+                    msg += " No more items of this name left."
+                else:
+                    self.discard_in_progress = False
+                    await self.show_page(self.current_page - 1)
+                    msg += " You can continue to discard items from above message."
+            else:
+                msg = "Action canceled, no changes made. You can continue to discard items from above message."
+
+            await message.delete()
+            await interaction.followup.send(msg, ephemeral=True)
+
+        self.discard_in_progress = False
 
 class Inventory(commands.GroupCog):
     """View and manage items in your inventory."""
@@ -183,7 +277,7 @@ class Inventory(commands.GroupCog):
 
     @app_commands.command()
     @checks.has_survival_profile()
-    async def discard(self, interaction: discord.Interaction, item: str, quantity: str = "all"):
+    async def discard(self, interaction: discord.Interaction, item: str, quantity: int = 1):
         """Discards an item from your inventory.
 
         Parameters
@@ -191,7 +285,7 @@ class Inventory(commands.GroupCog):
         item:
             The name of item.
         quantity:
-            The amount to discard. Defaults to "all".
+            The amount to discard. Defaults to 1. (Only applicable for non-stackable items.)
         """
         await interaction.response.defer()
 
@@ -200,28 +294,25 @@ class Inventory(commands.GroupCog):
         if item not in self.bot.items:
             raise checks.GenericError("Unknown item name provided.")
 
-        if quantity != "all" and not quantity.isdigit():
-            raise checks.GenericError("Quantity must be a valid number. If you want to discard the full amount, pass `all`.")
+        data = await InventoryItem.filter(player=interaction.extras["survival_profile"], item_id=item)
 
-        data = await InventoryItem.filter(player=interaction.extras["survival_profile"], item_id=item).first()
-
-        if data is None:
+        if not data:
             raise checks.GenericError("You don't have this item!")
-
-        item_data = self.bot.items[data.item_id]
-
-        if quantity.lower() == "all":
-            amount = data.quantity
+        if len(data) != 1:
+            view = InventoryDiscardView(items=data, bot=self.bot, user=interaction.user)
+            await view.start_pagination(interaction)
+            return
         else:
-            amount = int(quantity)
+            inv_item = data[0]
+            item_data = self.bot.items[inv_item.item_id]
 
-        if amount > data.quantity:
-            raise checks.GenericError(f"You don't have this much quantity. You only have `{data.quantity}` {item_data.name()}.")
+        if quantity > inv_item.quantity:
+            raise checks.GenericError(f"You don't have this much quantity. You only have `{inv_item.quantity}` {item_data.name()}.")
 
         confirmation = views.Confirmation(user=interaction.user, timeout=30)
         embed = discord.Embed(
             title=f"{cosmetics.EMOJI_DANGER} Are you sure?",
-            description=f"You are about to discard `{amount}` {item_data.name()}. After discarding, the item will be lost.",
+            description=f"You are about to discard `{quantity}` {item_data.name()}. After discarding, the item will be lost.",
             color=discord.Color.dark_embed(),
         )
 
@@ -231,8 +322,8 @@ class Inventory(commands.GroupCog):
             raise checks.GenericError("Action timed out. No changes made.")
 
         if confirmation.confirmed:
-            await data.remove(amount)
-            message = f"Discarded `{amount}` {item_data.name()}"
+            await inv_item.remove(quantity)
+            message = f"Discarded `{quantity}` {item_data.name()}"
         else:
             message = f"Action canceled. No changes were made."
 
@@ -397,6 +488,25 @@ class Inventory(commands.GroupCog):
             await interaction.followup.send(embed=result)
         else:
             raise checks.GenericError("This item cannot be used.")
+
+    # There seems to be a bug with autocompletion for integer options in discord.py.
+    # so these callbacks are commented until the problem is resolved.
+
+    # @smelt.autocomplete("quantity")  # type: ignore
+    # async def autocomplete_required_coal(self, interaction: discord.Interaction, current: int) -> List[app_commands.Choice[int]]:
+    #     return [app_commands.Choice(name=f"Coal required: {math.ceil(current / 4)}", value=current)]
+
+    # @craft.autocomplete("quantity")  # type: ignore
+    # async def autocomplete_required_material(self, interaction: discord.Interaction, current: int) -> List[app_commands.Choice[int]]:
+    #     item_id = interaction.namespace.item.replace(" ", "_").lower()
+    #     item = self.bot.items.get(item_id)
+    #     if item is None:
+    #         return [app_commands.Choice(name=f"Invalid item name", value=current)]
+    #     if not item.crafting_recipe:
+    #         return [app_commands.Choice(name=f"Item not craftable", value=current)]
+
+    #     material = [f"{q*current}x {n}" for q, n in item.crafting_recipe.items()]
+    #     return [app_commands.Choice(name=f"Required: {', '.join(material)}", value=current)]
 
     @use.autocomplete("item")
     async def autocomplete_item_name_usable(self, interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
