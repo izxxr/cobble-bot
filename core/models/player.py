@@ -22,7 +22,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Dict
 from core.datamodels import Achievements, PlayerFlags
 from tortoise.models import Model
 from tortoise import fields
@@ -31,6 +31,7 @@ from core import cosmetics, utils, constants
 
 if TYPE_CHECKING:
     from discord import Interaction
+    from core.datamodels import AchievementMetadata
 
 
 __all__ = (
@@ -102,11 +103,20 @@ class Player(Model):
             level_up = True
 
         if interaction is not None and level_up:
+            achievements: Dict[str, AchievementMetadata] = interaction.client.achievements  # type: ignore
             embed = Embed(
                 title=":arrow_double_up: Level up",
                 description=f"You have advanced to level {self.level}!",
                 color=Color.dark_embed(),
             )
+
+            for ach in achievements.values():  # type: ignore
+                level_reach = ach.unlock_conditions.get("level_reach")  # type: ignore
+                if level_reach == self.level:
+                    embed.add_field(name=f"Achievement: {ach.name(bold=False)}", value=ach.obtain_message)  # type: ignore
+                    self.achievements |= ach.value  # type: ignore
+                    await self.save()
+
             await interaction.followup.send(embed=embed, content=f"{interaction.user.mention}")
 
         return level_up

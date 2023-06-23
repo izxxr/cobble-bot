@@ -20,5 +20,9 @@
     "bone": {
         "probability": 0.4,
         "quantity": [1, 8]
+    },
+    "leather": {
+        "probability": 0.4,
+        "quantity": [1, 6]
     }
 }

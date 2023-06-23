@@ -65,6 +65,20 @@
         },
         "emoji": "<:minecraft_glass_bottle:1118051812868628591>"
     },
+    "paper": {
+        "display_name": "Paper",
+        "rarity": "common",
+        "type": "materials",
+        "description": "Small piece of paper",
+        "emoji": "<:minecraft_paper:1121743867578957845>"
+    },
+    "leather": {
+        "display_name": "Leather",
+        "rarity": "common",
+        "type": "materials",
+        "description": "A strong piece of leather.",
+        "emoji": "<:minecraft_leather:1121744247750664313>" 
+    },
     "saddle": {
         "display_name": "Saddle",
         "rarity": "uncommon",
@@ -223,6 +237,8 @@
         "description": "A weak pickaxe made up of wood.",
         "emoji": "<:minecraft_wood_pickaxe:1118988135334940732>",
         "durability": 10,
+        "supported_enchantments": 7,
+        "enchanted_emoji": "<a:mc_enchanted_wooden_pickaxe:1121753569998159943>",
         "crafting_recipe": {
             "oak_wood": 3,
             "sticks": 2
@@ -235,6 +251,8 @@
         "description": "A relatively durable pickaxe made up of stone.",
         "emoji": "<:minecraft_stone_pickaxe:1118990249389994005>",
         "durability": 15,
+        "supported_enchantments": 7,
+        "enchanted_emoji": "<a:mc_enchanted_stone_pickaxe:1121753557620768799>",
         "crafting_recipe": {
             "stone": 3,
             "sticks": 2
@@ -247,6 +265,8 @@
         "description": "A strong pickaxe made up of iron.",
         "emoji": "<:minecraft_iron_pickaxe:1118988130150776984>",
         "durability": 25,
+        "supported_enchantments": 7,
+        "enchanted_emoji": "<a:mc_enchanted_iron_pickaxe:1121753581817712650>",
         "crafting_recipe": {
             "iron_ingot": 3,
             "sticks": 2
@@ -259,6 +279,8 @@
         "description": "A rather brittle pickaxe made up of gold.",
         "emoji": "<:minecraft_gold_pickaxe:1118988125058896022>",
         "durability": 5,
+        "supported_enchantments": 7,
+        "enchanted_emoji": "<a:mc_enchanted_gold_pickaxe:1121753594073448508>",
         "crafting_recipe": {
             "gold_ingot": 3,
             "sticks": 2
@@ -270,10 +292,31 @@
         "type": "tools",
         "description": "A strong and durable pickaxe made up of diamond.",
         "emoji": "<:minecraft_diamond_pickaxe:1118988119635656856>",
+        "supported_enchantments": 7,
+        "enchanted_emoji": "<a:mc_enchanted_diamond_pickaxe:1121753605989474405>",
         "durability": 40,
         "crafting_recipe": {
             "diamond": 3,
             "sticks": 2
         }
+    },
+    "book": {
+        "display_name": "Book",
+        "rarity": "common",
+        "type": "materials",
+        "description": "A normal book.",
+        "emoji": "<:minecraft_book:1121743394880880701>",
+        "crafting_recipe": {
+            "paper": 3,
+            "leather": 2
+        }
+    },
+    "enchanted_book": {
+        "display_name": "Enchanted Book",
+        "rarity": "rare",
+        "type": "valuables",
+        "description": "An enchanted book. Could be used to enchant tools and weapons.",
+        "emoji": "<a:minecraft_enchanted_book:1121742587963912202>",
+        "supported_enchantments": -1
     }
 }

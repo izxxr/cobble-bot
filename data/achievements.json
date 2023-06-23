@@ -1,0 +1,35 @@
+{
+    "discover_biome_desert": {
+        "display_name": "Discover Desert Biome",
+        "value": 1,
+        "rarity": "common",
+        "description": "Discover the desert biome.",
+        "obtain_message": "You have discovered the desert biome. This biome is now explorable!",
+        "emoji": "<:minecraft_sand:1118035607239802920>",
+        "unlock_conditions": {
+            "biome_discovered": "desert"
+        }
+    },
+    "discover_biome_ocean": {
+        "display_name": "Discover Ocean Biome",
+        "value": 2,
+        "rarity": "uncommmon",
+        "description": "Discover the ocean biome.",
+        "obtain_message": "You have discovered the ocean biome. This biome is now explorable!",
+        "emoji": "<:minecraft_water:1118050009385009182>",
+        "unlock_conditions": {
+            "biome_discovered": "ocean"
+        }
+    },
+    "enchanter": {
+        "display_name": "Enchanter",
+        "value": 4,
+        "rarity": "uncommmon",
+        "description": "Unlock the ability to enchant.",
+        "obtain_message": "You can now enchant your tools and weapons to make them even more powerful and effective.",
+        "emoji": "<a:minecraft_enchanted_book:1121742587963912202>",
+        "unlock_conditions": {
+            "level_reach": 5
+        }
+    }
+}

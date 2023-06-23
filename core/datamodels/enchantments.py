@@ -22,62 +22,68 @@
 
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import TYPE_CHECKING, List
 from dataclasses import dataclass
 from discord.flags import BaseFlags, flag_value, fill_with_flags
 
+if TYPE_CHECKING:
+    from core.datamodels import Item
+
 __all__ = (
-    'AchievementMetadata',
-    'Achievements',
-    'PlayerFlags',
+    'Enchantments',
+    'EnchantmentMetadata'
 )
 
 
+ROMAN_NUMBERS = ['I', 'II', 'III', 'IV', 'V']
+
+
 @dataclass
-class AchievementMetadata:
-    """Represents an achievement"""
+class EnchantmentMetadata:
+    """Represents an enchantment."""
     id: str
     display_name: str
     value: int
+    rarity: str
     description: str
-    emoji: str
-    obtain_message: str
-    unlock_conditions: Dict[str, Any]
-
-    def name(self, *, bold: bool = True) -> str:
-        n = f"{self.emoji} {self.name}"
-        return f"**{n}**" if bold else n
 
 
 @fill_with_flags()
-class Achievements(BaseFlags):
-    """Represents the achievements a user has."""
+class Enchantments(BaseFlags):
+    """Represents the enchantments an enchanted item has."""
+
     @flag_value
-    def discover_biome_desert(self) -> int:
-        """Discover the desert biome."""
+    def unbreaking_1(self) -> int:
         return 1 << 0
 
     @flag_value
-    def discover_biome_ocean(self) -> int:
-        """Discover the ocean biome."""
+    def unbreaking_2(self) -> int:
         return 1 << 1
 
     @flag_value
-    def enchanter(self) -> int:
-        """Whether the player can enchant items."""
+    def unbreaking_3(self) -> int:
         return 1 << 2
 
+    def supported(self, item: Item) -> bool:
+        """Indicates whether enhantments enabled in "self" are supported on the "item"."""
+        return self.value & item.supported_enchantments == self.value
 
-@fill_with_flags()
-class PlayerFlags(BaseFlags):
-    """Represents the flags a user has."""
+    def get_names(self) -> List[str]:
+        """Get proper display names for the enabled enchantments."""
+        names: List[str] = []
+        for name, val in self.VALID_FLAGS.items():
+            if not self._has_flag(val):
+                continue
+            
+            parts = name.split("_")
+            proper = " ".join(parts).title()
+            level = int(parts[-1])
 
-    @flag_value
-    def died_once(self) -> int:
-        """The player has died at least once."""
-        return 1 << 0
+            try:
+                names.append(proper.replace(parts[-1], ROMAN_NUMBERS[level-1]))
+            except IndexError:
+                # This should never happen but just to be on the safer side.
+                # Roman number probably not available for level.
+                names.append(proper)
 
-    @flag_value
-    def hide_on_leaderboard(self) -> int:
-        """Whether the player is hidden on leaderboard."""
-        return 1 << 1
+        return names

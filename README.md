@@ -9,8 +9,8 @@ Minecraft inspired bot bringing fun survival experience to Discord.
 - [x] Fishing
 - [x] Mining
 - [x] Global and Guild Leaderboards
+- [ ] Enchantments
 - [ ] Pets and Animals
-- [ ] Charms (similar to enchantments but applied temporarily to player and provide perks while applied)
 
 ## Self Hosting
 Self hosting is not supported and no help will be provided to self host your own instance of

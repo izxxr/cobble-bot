@@ -22,8 +22,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 from dataclasses import dataclass
+from .enchantments import Enchantments
+
+if TYPE_CHECKING:
+    from core.models import InventoryItem
 
 __all__ = (
     'Item',
@@ -40,14 +44,27 @@ class Item:
     rarity: str
     type: str
     emoji: str
+    supported_enchantments: int = 0
+    crafting_quantity: int = 1
     crafting_recipe: Optional[Dict[str, int]] = None
     smelting_recipe: Optional[str] = None
     smelting_product: Optional[str] = None
     durability: Optional[int] = None
-    crafting_quantity: int = 1
     food_hp_restored: Optional[float] = None
+    enchanted_emoji: Optional[str] = None
 
+    def enchantable(self) -> bool:
+        return self.supported_enchantments != 0
 
-    def name(self, bold: bool = True) -> str:
-        n = f"{self.emoji} {self.display_name}"
+    def name(self, inv_item: Optional[InventoryItem] = None, *, bold: bool = True) -> str:
+        if inv_item and inv_item.enchantments != 0:
+            n = f"{self.enchanted_emoji if self.enchanted_emoji else self.emoji} Enchanted {self.display_name}"
+        else:
+            n = f"{self.emoji} {self.display_name}"
+
         return f"**{n}**" if bold else n
+
+    def get_supported_enchantments(self) -> Enchantments:
+        ench = Enchantments()
+        ench.value = self.supported_enchantments
+        return ench

@@ -23,5 +23,13 @@
     "raw_chicken": {
         "probability": 0.5,
         "quantity": [1, 4]
+    },
+    "paper": {
+        "probability": 0.5,
+        "quantity": [1, 8]
+    },
+    "leather": {
+        "probability": 0.6,
+        "quantity": [1, 6]
     }
 }

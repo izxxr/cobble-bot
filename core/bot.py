@@ -119,6 +119,10 @@ class CobbleBot(commands.Bot):
         # Data caches
         self.items: Dict[str, datamodels.Item] = {}
         self.biomes: Dict[str, datamodels.Biome] = {}
+        self.achievements: Dict[str, datamodels.AchievementMetadata] = {}
+        self.achievements_value: Dict[int, datamodels.AchievementMetadata] = {}
+        self.enchantments: Dict[str, datamodels.EnchantmentMetadata] = {}
+        self.enchantments_value: Dict[int, datamodels.EnchantmentMetadata] = {}
         self.loot_tables: Dict[str, datamodels.LootTable] = {}
 
     async def launch(self) -> None:
@@ -204,6 +208,22 @@ class CobbleBot(commands.Bot):
             for biome_id, data in file.items():
                 biome = datamodels.Biome(biome_id, **data)
                 self.biomes[biome_id] = biome
+
+        with open('data/achievements.json') as f:
+            file = json.loads(f.read())
+
+            for achievement_id, data in file.items():
+                achievement = datamodels.AchievementMetadata(achievement_id, **data)
+                self.achievements[achievement_id] = achievement
+                self.achievements_value[achievement.value] = achievement
+
+        with open('data/enchantments.json') as f:
+            file = json.loads(f.read())
+
+            for enchantment_id, data in file.items():
+                enchantment = datamodels.EnchantmentMetadata(enchantment_id, **data)
+                self.enchantments[enchantment_id] = enchantment
+                self.enchantments_value[enchantment.value] = enchantment
 
         _log.info("Caching loot tables")
 

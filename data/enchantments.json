@@ -1,0 +1,20 @@
+{
+    "unbreaking_1": {
+        "display_name": "Unbreaking I",
+        "value": 1,
+        "rarity": "common",
+        "description": "Increases the durability of an item by 15 points."
+    },
+    "unbreaking_2": {
+        "display_name": "Unbreaking II",
+        "value": 2,
+        "rarity": "uncommon",
+        "description": "Increases the durability of an item by 30 points."
+    },
+    "unbreaking_3": {
+        "display_name": "Unbreaking III",
+        "value": 4,
+        "rarity": "rare",
+        "description": "Increases the durability of an item by 60 points."
+    }
+}

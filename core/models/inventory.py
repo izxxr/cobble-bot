@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Union, List
+from core.datamodels import Enchantments
 from tortoise.models import Model
 from tortoise import fields
 
@@ -49,6 +50,14 @@ class InventoryItem(Model):
 
     durability = fields.IntField(null=True)
     """The durability of item."""
+
+    enchantments = fields.IntField(default=0)
+    """The enchantments item has."""
+
+    def get_enchantments(self) -> Enchantments:
+        ench = Enchantments()
+        ench.value = self.enchantments
+        return ench
 
     async def edit_durability(self, durability: int) -> bool:
         """Edits the durability. The passed durability must be a signed integer.
